@@ -1,5 +1,5 @@
 'use client';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { AppLayout } from '@/components/app-layout';
 import { Button } from '@/components/ui/button';
 import {
@@ -12,7 +12,7 @@ import {
 } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { useToast } from '@/hooks/use-toast';
-import { CheckCircle, Info, Award, RotateCw, Loader2, WandSparkles } from 'lucide-react';
+import { CheckCircle, Info, Award, RotateCw, Loader2, WandSparkles, HelpCircle } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import {
   AlertDialog,
@@ -23,22 +23,27 @@ import {
   AlertDialogFooter,
 } from '@/components/ui/alert-dialog';
 import { generateWordPuzzles } from '@/ai/flows/generate-word-puzzle';
+import { Progress } from '@/components/ui/progress';
 
 type Puzzle = {
   word: string;
   hint: string;
   scrambled: string;
   explanation: string;
+  hintActive?: boolean;
 };
 
 const shuffleWord = (word: string) => {
   if (!word) return '';
   let shuffled = word.split('').sort(() => 0.5 - Math.random()).join('');
+  // Ensure the shuffled word is not the same as the original, if possible
   while (shuffled === word && word.length > 1) {
     shuffled = word.split('').sort(() => 0.5 - Math.random()).join('');
   }
   return shuffled;
 };
+
+const HINT_TIMER_DURATION = 15; // seconds
 
 export default function WordPuzzlePage() {
   const [puzzles, setPuzzles] = useState<Puzzle[]>([]);
@@ -48,10 +53,51 @@ export default function WordPuzzlePage() {
   const [isSolved, setIsSolved] = useState(false);
   const [showCongrats, setShowCongrats] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
+  const [timeLeft, setTimeLeft] = useState(HINT_TIMER_DURATION);
+  const timerRef = useRef<NodeJS.Timeout | null>(null);
   const { toast } = useToast();
+
+  const resetTimer = () => {
+    if (timerRef.current) {
+      clearInterval(timerRef.current);
+    }
+    setTimeLeft(HINT_TIMER_DURATION);
+  };
+
+  const startTimer = () => {
+    resetTimer();
+    timerRef.current = setInterval(() => {
+      setTimeLeft(prev => prev - 1);
+    }, 1000);
+  };
+
+  useEffect(() => {
+    if (timeLeft <= 0 && !isSolved) {
+        if (timerRef.current) clearInterval(timerRef.current);
+        
+        setPuzzles(prevPuzzles => {
+            const newPuzzles = [...prevPuzzles];
+            const currentPuzzle = newPuzzles[currentPuzzleIndex];
+            if (currentPuzzle && !currentPuzzle.hintActive) {
+                const firstTwo = currentPuzzle.word.substring(0, 2);
+                const rest = currentPuzzle.word.substring(2);
+                const scrambledRest = shuffleWord(rest);
+                currentPuzzle.scrambled = firstTwo + scrambledRest;
+                currentPuzzle.hintActive = true;
+            }
+            return newPuzzles;
+        });
+
+        toast({
+            title: "Here's a hint!",
+            description: "The first two letters are now in place.",
+        });
+    }
+  }, [timeLeft, isSolved, currentPuzzleIndex]);
 
   const loadNewPuzzles = async () => {
     setIsLoading(true);
+    resetTimer();
     setGuess('');
     setFeedback(null);
     setIsSolved(false);
@@ -63,8 +109,10 @@ export default function WordPuzzlePage() {
       const newPuzzles = result.puzzles.map(p => ({
         ...p,
         scrambled: shuffleWord(p.word),
+        hintActive: false,
       }));
       setPuzzles(newPuzzles);
+      startTimer();
     } catch (error) {
         console.error("Failed to generate word puzzle:", error);
         toast({
@@ -79,6 +127,9 @@ export default function WordPuzzlePage() {
 
   useEffect(() => {
     loadNewPuzzles();
+    return () => {
+        if (timerRef.current) clearInterval(timerRef.current);
+    }
   }, []);
 
   const currentPuzzle = puzzles[currentPuzzleIndex];
@@ -89,6 +140,7 @@ export default function WordPuzzlePage() {
     if (guess.toUpperCase() === currentPuzzle.word) {
       setFeedback('correct');
       setIsSolved(true);
+      resetTimer();
       if (currentPuzzleIndex === puzzles.length - 1) {
         setShowCongrats(true);
       }
@@ -107,10 +159,13 @@ export default function WordPuzzlePage() {
       setIsSolved(false);
       setGuess('');
       setFeedback(null);
+      startTimer();
     } else {
       loadNewPuzzles(); // All puzzles solved, load a new batch
     }
   };
+  
+  const timerProgress = (timeLeft / HINT_TIMER_DURATION) * 100;
 
   return (
     <AppLayout>
@@ -157,6 +212,15 @@ export default function WordPuzzlePage() {
                  </div>
             ) : currentPuzzle ? (
                 <>
+                    {!isSolved && timeLeft > 0 && (
+                        <div className="w-full space-y-2">
+                           <div className="flex justify-center items-center gap-2 text-sm text-muted-foreground">
+                               <HelpCircle className="w-4 h-4"/>
+                               <span>Hint unlocks in {timeLeft}s</span>
+                           </div>
+                           <Progress value={100 - timerProgress} className="h-2"/>
+                        </div>
+                    )}
                     <div className="flex items-center justify-center p-4 bg-muted rounded-lg w-full min-h-[80px]">
                         <p className="text-4xl font-bold tracking-widest text-primary font-mono">
                             {isSolved ? currentPuzzle.word : currentPuzzle.scrambled}

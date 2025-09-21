@@ -10,9 +10,18 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/card';
-import { CheckCircle, XCircle, Loader2, WandSparkles } from 'lucide-react';
+import { CheckCircle, XCircle, Loader2, WandSparkles, PartyPopper, RotateCw } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { generateEcoSituations, EcoSituation } from '@/ai/flows/generate-eco-situation';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle
+} from "@/components/ui/alert-dialog";
 
 type Scenario = EcoSituation;
 
@@ -38,6 +47,8 @@ export default function SituationGamePage() {
   const [currentScenarioIndex, setCurrentScenarioIndex] = useState(0);
   const [selectedOption, setSelectedOption] = useState<number | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [score, setScore] = useState(0);
+  const [isGameComplete, setIsGameComplete] = useState(false);
   const { toast } = useToast();
 
   const loadNewScenarios = async () => {
@@ -45,6 +56,8 @@ export default function SituationGamePage() {
     setSelectedOption(null);
     setScenarios([]);
     setCurrentScenarioIndex(0);
+    setScore(0);
+    setIsGameComplete(false);
     try {
       const result = await generateEcoSituations({ theme: 'everyday sustainability', count: 10 });
       const shuffledScenarios = result.scenarios.map(scenario => ({
@@ -74,6 +87,8 @@ export default function SituationGamePage() {
 
     const choice = scenarios[currentScenarioIndex].options[index];
     if (choice.isCorrect) {
+      const points = 10;
+      setScore(prev => prev + points);
       toast({
         title: 'Good Choice!',
         description: choice.feedback,
@@ -86,23 +101,50 @@ export default function SituationGamePage() {
     if (currentScenarioIndex < scenarios.length - 1) {
       setCurrentScenarioIndex(currentScenarioIndex + 1);
     } else {
-      // All scenarios completed, load a new batch
-      loadNewScenarios();
+      // All scenarios completed
+      setIsGameComplete(true);
     }
   };
+
+  const handlePlayAgain = () => {
+    loadNewScenarios();
+  }
 
   const currentScenario = scenarios[currentScenarioIndex];
   const choice = selectedOption !== null && currentScenario ? currentScenario.options[selectedOption] : null;
 
+  const totalPossiblePoints = scenarios.length * 10;
+
   return (
     <AppLayout>
+      <AlertDialog open={isGameComplete} onOpenChange={setIsGameComplete}>
+          <AlertDialogContent>
+              <AlertDialogHeader className="items-center text-center">
+                  <PartyPopper className="w-16 h-16 text-primary" />
+                  <AlertDialogTitle className="font-headline text-3xl">Congratulations!</AlertDialogTitle>
+                  <AlertDialogDescription className="text-lg">
+                      You've completed all the scenarios!
+                  </AlertDialogDescription>
+                  <div className="pt-4 text-2xl">
+                    Your final score is: <span className="font-bold text-primary">{score} / {totalPossiblePoints}</span>
+                  </div>
+              </AlertDialogHeader>
+              <AlertDialogFooter>
+                  <Button onClick={handlePlayAgain} className="w-full">
+                      <RotateCw className="mr-2" />
+                      Play Again
+                  </Button>
+              </AlertDialogFooter>
+          </AlertDialogContent>
+      </AlertDialog>
+
       <div className="space-y-8">
         <header>
           <h2 className="text-3xl font-bold tracking-tight font-headline">
             AI Eco Situation Simulator
           </h2>
           <p className="text-muted-foreground mt-1">
-            Make the most sustainable choice in these AI-generated situations. ({currentScenarioIndex + 1} of {scenarios.length})
+           {scenarios.length > 0 ? `Make the most sustainable choice in these AI-generated situations. (${currentScenarioIndex + 1} of ${scenarios.length})` : 'Loading scenarios...'}
           </p>
         </header>
 
@@ -162,7 +204,7 @@ export default function SituationGamePage() {
              <CardFooter>
                 <Button onClick={handleNext} className="w-full" disabled={isLoading && scenarios.length > 0}>
                     {isLoading && scenarios.length > 0 ? <Loader2 className="mr-2 h-4 w-4 animate-spin"/> : null}
-                    {currentScenarioIndex < scenarios.length - 1 ? 'Next Scenario' : 'Play Again'}
+                    {currentScenarioIndex < scenarios.length - 1 ? 'Next Scenario' : 'Finish & See Score'}
                 </Button>
             </CardFooter>
           )}

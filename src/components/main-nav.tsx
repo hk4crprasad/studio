@@ -14,6 +14,7 @@ import {
   ClipboardCheck,
   BrainCircuit,
   ShoppingCart,
+  Recycle,
 } from 'lucide-react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
@@ -30,6 +31,7 @@ export function MainNav() {
     { href: '/puzzle-game', label: 'Eco Word Scramble', icon: Puzzle },
     { href: '/situation-game', label: 'Eco Situation', icon: ClipboardCheck },
     { href: '/carbon-quiz', label: 'Carbon IQ Challenge', icon: BrainCircuit },
+    { href: '/garbage-sorting-game', label: 'Garbage Sorting', icon: Recycle },
   ];
 
   return (

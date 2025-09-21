@@ -93,7 +93,7 @@ export default function WordPuzzlePage() {
             description: "The first two letters are now in place.",
         });
     }
-  }, [timeLeft, isSolved, currentPuzzleIndex]);
+  }, [timeLeft, isSolved, currentPuzzleIndex, toast]);
 
   const loadNewPuzzles = async () => {
     setIsLoading(true);
@@ -105,7 +105,7 @@ export default function WordPuzzlePage() {
     setPuzzles([]);
     setCurrentPuzzleIndex(0);
     try {
-      const result = await generateWordPuzzles({ theme: 'sustainability', count: 10 });
+      const result = await generateWordPuzzles({ theme: 'sustainability, civic sense, waste management, carbon emission', count: 10 });
       const newPuzzles = result.puzzles.map(p => ({
         ...p,
         scrambled: shuffleWord(p.word),
@@ -130,6 +130,7 @@ export default function WordPuzzlePage() {
     return () => {
         if (timerRef.current) clearInterval(timerRef.current);
     }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const currentPuzzle = puzzles[currentPuzzleIndex];
@@ -142,7 +143,7 @@ export default function WordPuzzlePage() {
       setIsSolved(true);
       resetTimer();
       if (currentPuzzleIndex === puzzles.length - 1) {
-        setShowCongrats(true);
+        setTimeout(() => setShowCongrats(true), 1000);
       }
       toast({
         title: 'Correct!',
@@ -261,7 +262,7 @@ export default function WordPuzzlePage() {
             )}
 
             {isSolved && currentPuzzle && (
-                <div className="w-full p-4 rounded-md border-green-500 bg-green-500/10 text-green-800 flex items-start gap-3">
+                <div className="w-full p-4 rounded-md border-green-500 bg-green-500/10 text-green-800 flex items-start gap-3 animate-in fade-in duration-500">
                    <Info className="h-5 w-5 mt-0.5 flex-shrink-0" />
                    <p className="font-medium">
                        <span className="font-bold">Did you know?</span> {currentPuzzle.explanation}
@@ -269,11 +270,11 @@ export default function WordPuzzlePage() {
                 </div>
             )}
           </CardContent>
-          {isSolved && (
+          {isSolved && currentPuzzleIndex < puzzles.length -1 && (
             <CardFooter>
                  <Button onClick={handleNextWord} className="w-full" disabled={isLoading}>
                     <RotateCw className="mr-2 h-4 w-4" />
-                    <span>{currentPuzzleIndex < puzzles.length - 1 ? 'Next Word' : 'Play Again'}</span>
+                    <span>Next Word</span>
                 </Button>
             </CardFooter>
           )}

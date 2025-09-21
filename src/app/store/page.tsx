@@ -50,7 +50,7 @@ export default function StorePage() {
                 <p className="text-sm">{product.description}</p>
               </CardContent>
               <CardFooter className="flex justify-between items-center bg-muted/50 p-4">
-                <div className="font-bold text-lg text-primary">${product.price.toFixed(2)}</div>
+                <div className="font-bold text-lg text-primary">₹{product.price.toFixed(2)}</div>
                 <Button onClick={() => handleAddToCart(product.name)}>
                   <ShoppingCart className="mr-2"/>
                   Add to Cart

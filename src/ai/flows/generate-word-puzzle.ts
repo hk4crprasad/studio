@@ -41,9 +41,9 @@ const generateWordPuzzlePrompt = ai.definePrompt({
   input: {schema: WordPuzzleInputSchema},
   output: {schema: WordPuzzleOutputSchema},
   config: {
-    temperature: 0.8,
+    temperature: 1.0,
   },
-  prompt: `You are a creative game master. Generate {{{count}}} word puzzles based on the theme of {{{theme}}}. The themes can include sustainability, civic sense, waste management, and carbon emission reduction.
+  prompt: `You are a creative game master. Generate {{{count}}} unique word puzzles based on the theme of {{{theme}}}. The themes can include sustainability, civic sense, waste management, and carbon emission reduction.
 
   For each puzzle, provide:
   1. A single, relevant word between 6 and 10 letters long, in uppercase.

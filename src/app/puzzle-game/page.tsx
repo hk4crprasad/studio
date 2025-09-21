@@ -1,5 +1,5 @@
 'use client';
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect } from 'react';
 import { AppLayout } from '@/components/app-layout';
 import { Button } from '@/components/ui/button';
 import {
@@ -14,6 +14,15 @@ import { Input } from '@/components/ui/input';
 import { useToast } from '@/hooks/use-toast';
 import { CheckCircle, XCircle, Award, RotateCw } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import {
+  AlertDialog,
+  AlertDialogContent,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogAction,
+} from '@/components/ui/alert-dialog';
 
 const WORDS = [
   'RECYCLE',
@@ -43,6 +52,7 @@ export default function WordPuzzlePage() {
   const [guess, setGuess] = useState('');
   const [feedback, setFeedback] = useState<'correct' | 'incorrect' | null>(null);
   const [isSolved, setIsSolved] = useState(false);
+  const [showCongrats, setShowCongrats] = useState(false);
   const { toast } = useToast();
 
   const loadNewWord = () => {
@@ -52,6 +62,7 @@ export default function WordPuzzlePage() {
     setIsSolved(false);
     setFeedback(null);
     setGuess('');
+    setShowCongrats(false);
   };
 
   useEffect(() => {
@@ -63,9 +74,10 @@ export default function WordPuzzlePage() {
     if (guess.toUpperCase() === currentWord) {
       setFeedback('correct');
       setIsSolved(true);
+      setShowCongrats(true);
       toast({
         title: 'Correct!',
-        description: 'You unscrambled the word and earned 50 points!',
+        description: 'You earned 50 points!',
       });
     } else {
       setFeedback('incorrect');
@@ -74,10 +86,28 @@ export default function WordPuzzlePage() {
 
   const handleNextWord = () => {
     loadNewWord();
-  }
+  };
 
   return (
     <AppLayout>
+       <AlertDialog open={showCongrats} onOpenChange={setShowCongrats}>
+        <AlertDialogContent>
+          <AlertDialogHeader className="items-center text-center">
+            <Award className="w-16 h-16 text-primary" />
+            <AlertDialogTitle className="font-headline text-3xl">Congratulations!</AlertDialogTitle>
+            <AlertDialogDescription className="text-lg">
+              You solved the puzzle and earned <span className="font-bold text-primary">50 points!</span>
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <Button onClick={handleNextWord} className="w-full">
+              <RotateCw className="mr-2" />
+              Play Next Word
+            </Button>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
       <div className="space-y-8">
         <header>
           <h2 className="text-3xl font-bold tracking-tight font-headline">
@@ -123,7 +153,7 @@ export default function WordPuzzlePage() {
                 </form>
             )}
 
-            {feedback && (
+            {feedback && !isSolved && (
                  <div className={cn(
                     "w-full p-3 rounded-md border flex items-center gap-3",
                     feedback === 'correct' ? 'border-green-500 bg-green-500/10 text-green-700' : 'border-red-500 bg-red-500/10 text-red-700'
@@ -134,15 +164,10 @@ export default function WordPuzzlePage() {
                     </p>
                  </div>
             )}
-           
           </CardContent>
           {isSolved && (
             <CardFooter className="flex flex-col gap-4 items-center text-center">
-                 <div className="flex items-center gap-2 text-primary font-bold text-lg">
-                    <Award />
-                    <span>50 Points Rewarded!</span>
-                </div>
-                <Button onClick={handleNextWord}>
+                 <Button onClick={handleNextWord} className="w-full">
                     <RotateCw />
                     <span>Next Word</span>
                 </Button>

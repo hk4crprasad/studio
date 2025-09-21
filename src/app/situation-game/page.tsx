@@ -11,6 +11,7 @@ import {
   CardTitle,
 } from '@/components/ui/card';
 import { CheckCircle, XCircle } from 'lucide-react';
+import { useToast } from '@/hooks/use-toast';
 
 const scenarios = [
   {
@@ -31,14 +32,31 @@ const scenarios = [
       { text: 'Try to carry as many items as you can without any bag.', isCorrect: false, feedback: "A for effort! But this might not be practical and could lead to damaged goods. Keeping a foldable bag in your car or backpack is a great habit." },
     ],
   },
+   {
+    title: 'The Leaky Faucet',
+    description: 'You notice the faucet in your kitchen has been dripping slowly for a few days. What should you do?',
+    options: [
+      { text: 'Ignore it, it\'s just a small drip.', isCorrect: false, feedback: 'Even a small drip can waste thousands of gallons of water per year! It\'s best to address it.' },
+      { text: 'Try to fix it yourself by watching an online tutorial.', isCorrect: true, feedback: 'Good initiative! Many minor leaks can be fixed with simple tools. You saved water and money. You earned 20 eco-points!' },
+      { text: 'Call a plumber immediately.', isCorrect: true, feedback: "A great choice if you're not comfortable with DIY. The important thing is getting it fixed. You earned 15 eco-points!" },
+    ],
+  },
 ];
 
 export default function SituationGamePage() {
   const [scenarioIndex, setScenarioIndex] = useState(0);
   const [selectedOption, setSelectedOption] = useState<number | null>(null);
+  const { toast } = useToast();
 
   const handleOptionSelect = (index: number) => {
     setSelectedOption(index);
+    const choice = scenarios[scenarioIndex].options[index];
+    if (choice.isCorrect) {
+        toast({
+            title: 'Good Choice!',
+            description: choice.feedback,
+        })
+    }
   };
 
   const handleNext = () => {

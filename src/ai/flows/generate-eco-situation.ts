@@ -1,9 +1,9 @@
 'use server';
 
 /**
- * @fileOverview This file defines a Genkit flow for generating an eco-situation scenario for a game.
+ * @fileOverview This file defines a Genkit flow for generating multiple eco-situation scenarios for a game.
  *
- * The flow generates a title, description, and a set of options for a given theme.
+ * The flow generates a list of scenarios, each with a title, description, and a set of options for a given theme.
  */
 
 import {ai} from '@/ai/genkit';
@@ -15,51 +15,61 @@ const SituationOptionSchema = z.object({
   feedback: z.string().describe('Feedback to show the user after they select this option.'),
 });
 
-const EcoSituationInputSchema = z.object({
-  theme: z
-    .string()
-    .describe('The theme for the eco-situation (e.g., waste reduction, water conservation).'),
-});
-export type EcoSituationInput = z.infer<typeof EcoSituationInputSchema>;
-
-const EcoSituationOutputSchema = z.object({
+const EcoSituationSchema = z.object({
   title: z.string().describe('The title of the scenario.'),
   description: z.string().describe('A description of the situation.'),
   options: z.array(SituationOptionSchema).length(3).describe('An array of three possible choices for the user.'),
 });
-export type EcoSituationOutput = z.infer<typeof EcoSituationOutputSchema>;
+export type EcoSituation = z.infer<typeof EcoSituationSchema>;
 
-export async function generateEcoSituation(
-  input: EcoSituationInput
-): Promise<EcoSituationOutput> {
-  return generateEcoSituationFlow(input);
+const EcoSituationsInputSchema = z.object({
+  theme: z
+    .string()
+    .describe('The theme for the eco-situations (e.g., waste reduction, water conservation).'),
+  count: z
+    .number()
+    .int()
+    .positive()
+    .describe('The number of situations to generate.'),
+});
+export type EcoSituationsInput = z.infer<typeof EcoSituationsInputSchema>;
+
+const EcoSituationsOutputSchema = z.object({
+  scenarios: z.array(EcoSituationSchema),
+});
+export type EcoSituationsOutput = z.infer<typeof EcoSituationsOutputSchema>;
+
+export async function generateEcoSituations(
+  input: EcoSituationsInput
+): Promise<EcoSituationsOutput> {
+  return generateEcoSituationsFlow(input);
 }
 
-const generateEcoSituationPrompt = ai.definePrompt({
-  name: 'generateEcoSituationPrompt',
-  input: {schema: EcoSituationInputSchema},
-  output: {schema: EcoSituationOutputSchema},
+const generateEcoSituationsPrompt = ai.definePrompt({
+  name: 'generateEcoSituationsPrompt',
+  input: {schema: EcoSituationsInputSchema},
+  output: {schema: EcoSituationsOutputSchema},
   prompt: `You are a game designer creating scenarios for an educational game about sustainability and environmental civic sense.
 
-Generate a scenario based on the theme of {{{theme}}}.
+Generate a list of {{{count}}} scenarios based on the theme of {{{theme}}}.
 
-The scenario should present a common, everyday situation where a person can make a choice that impacts the environment.
+Each scenario should present a common, everyday situation where a person can make a choice that impacts the environment.
 
-Provide a concise title, a description of the situation, and exactly three options.
+For each scenario, provide a concise title, a description of the situation, and exactly three options.
 - One option should be the most sustainable/correct choice.
 - The other two options should be common but less sustainable alternatives.
 - For each option, provide brief, educational feedback explaining the consequence or benefit of that choice. The feedback for a correct answer should include a reward, for example 'You earned 10 eco-points!'.
 `,
 });
 
-const generateEcoSituationFlow = ai.defineFlow(
+const generateEcoSituationsFlow = ai.defineFlow(
   {
-    name: 'generateEcoSituationFlow',
-    inputSchema: EcoSituationInputSchema,
-    outputSchema: EcoSituationOutputSchema,
+    name: 'generateEcoSituationsFlow',
+    inputSchema: EcoSituationsInputSchema,
+    outputSchema: EcoSituationsOutputSchema,
   },
   async input => {
-    const {output} = await generateEcoSituationPrompt(input);
+    const {output} = await generateEcoSituationsPrompt(input);
     return output!;
   }
 );

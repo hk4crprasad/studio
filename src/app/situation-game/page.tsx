@@ -12,29 +12,31 @@ import {
 } from '@/components/ui/card';
 import { CheckCircle, XCircle, Loader2, WandSparkles } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
-import { generateEcoSituation, EcoSituationOutput } from '@/ai/flows/generate-eco-situation';
+import { generateEcoSituations, EcoSituation } from '@/ai/flows/generate-eco-situation';
 
-type Scenario = EcoSituationOutput;
+type Scenario = EcoSituation;
 
 export default function SituationGamePage() {
-  const [currentScenario, setCurrentScenario] = useState<Scenario | null>(null);
+  const [scenarios, setScenarios] = useState<Scenario[]>([]);
+  const [currentScenarioIndex, setCurrentScenarioIndex] = useState(0);
   const [selectedOption, setSelectedOption] = useState<number | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const { toast } = useToast();
 
-  const loadNewScenario = async () => {
+  const loadNewScenarios = async () => {
     setIsLoading(true);
     setSelectedOption(null);
-    setCurrentScenario(null);
+    setScenarios([]);
+    setCurrentScenarioIndex(0);
     try {
-      const scenario = await generateEcoSituation({ theme: 'everyday sustainability' });
-      setCurrentScenario(scenario);
+      const result = await generateEcoSituations({ theme: 'everyday sustainability', count: 10 });
+      setScenarios(result.scenarios);
     } catch (error) {
-      console.error("Failed to generate scenario:", error);
+      console.error("Failed to generate scenarios:", error);
       toast({
         variant: "destructive",
-        title: "Could not load new scenario",
-        description: "There was an issue generating a new situation from the AI. Please try again."
+        title: "Could not load new scenarios",
+        description: "There was an issue generating new situations from the AI. Please try again."
       });
     } finally {
       setIsLoading(false);
@@ -42,14 +44,14 @@ export default function SituationGamePage() {
   };
 
   useEffect(() => {
-    loadNewScenario();
+    loadNewScenarios();
   }, []);
 
   const handleOptionSelect = (index: number) => {
     setSelectedOption(index);
-    if (!currentScenario) return;
+    if (scenarios.length === 0) return;
 
-    const choice = currentScenario.options[index];
+    const choice = scenarios[currentScenarioIndex].options[index];
     if (choice.isCorrect) {
       toast({
         title: 'Good Choice!',
@@ -59,9 +61,16 @@ export default function SituationGamePage() {
   };
 
   const handleNext = () => {
-    loadNewScenario();
+    setSelectedOption(null);
+    if (currentScenarioIndex < scenarios.length - 1) {
+      setCurrentScenarioIndex(currentScenarioIndex + 1);
+    } else {
+      // All scenarios completed, load a new batch
+      loadNewScenarios();
+    }
   };
 
+  const currentScenario = scenarios[currentScenarioIndex];
   const choice = selectedOption !== null && currentScenario ? currentScenario.options[selectedOption] : null;
 
   return (
@@ -72,17 +81,17 @@ export default function SituationGamePage() {
             AI Eco Situation Simulator
           </h2>
           <p className="text-muted-foreground mt-1">
-            Make the most sustainable choice in these AI-generated situations.
+            Make the most sustainable choice in these AI-generated situations. ({currentScenarioIndex + 1} of {scenarios.length})
           </p>
         </header>
 
         <Card className="max-w-xl mx-auto">
           <CardHeader>
-            {isLoading ? (
+            {isLoading && scenarios.length === 0 ? (
                 <div className="space-y-2">
                     <div className="font-headline text-center flex items-center justify-center gap-2 text-2xl">
                         <WandSparkles className="text-primary"/>
-                        AI is creating a scenario...
+                        AI is creating scenarios...
                     </div>
                     <CardDescription className="text-center">Please wait a moment.</CardDescription>
                 </div>
@@ -97,7 +106,7 @@ export default function SituationGamePage() {
             ))}
           </CardHeader>
           <CardContent className="space-y-4 min-h-[200px]">
-            {isLoading ? (
+            {isLoading && scenarios.length === 0 ? (
                  <div className="flex flex-col items-center justify-center p-4 text-center h-full">
                     <Loader2 className="w-8 h-8 animate-spin text-primary"/>
                  </div>
@@ -128,11 +137,11 @@ export default function SituationGamePage() {
                 )
             )}
           </CardContent>
-          {(selectedOption !== null || !isLoading && !currentScenario) && (
+          {(selectedOption !== null || (!isLoading && !currentScenario)) && (
              <CardFooter>
-                <Button onClick={handleNext} className="w-full" disabled={isLoading}>
-                    {isLoading ? <Loader2 className="mr-2 h-4 w-4 animate-spin"/> : null}
-                    Next Scenario
+                <Button onClick={handleNext} className="w-full" disabled={isLoading && scenarios.length > 0}>
+                    {isLoading && scenarios.length > 0 ? <Loader2 className="mr-2 h-4 w-4 animate-spin"/> : null}
+                    {currentScenarioIndex < scenarios.length - 1 ? 'Next Scenario' : 'Play Again'}
                 </Button>
             </CardFooter>
           )}

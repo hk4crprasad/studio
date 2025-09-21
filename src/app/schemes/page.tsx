@@ -6,6 +6,9 @@ import {
   AccordionTrigger,
 } from '@/components/ui/accordion';
 import { schemes } from '@/lib/data';
+import { Button } from '@/components/ui/button';
+import Link from 'next/link';
+import { ExternalLink } from 'lucide-react';
 
 export default function SchemesPage() {
   return (
@@ -26,8 +29,14 @@ export default function SchemesPage() {
               <AccordionTrigger className="font-headline text-left text-lg hover:no-underline">
                 {scheme.name}
               </AccordionTrigger>
-              <AccordionContent className="text-base">
-                {scheme.description}
+              <AccordionContent className="text-base space-y-4">
+                <p>{scheme.description}</p>
+                <Button asChild>
+                  <Link href={scheme.link} target="_blank">
+                    <ExternalLink className="mr-2" />
+                    Apply Now
+                  </Link>
+                </Button>
               </AccordionContent>
             </AccordionItem>
           ))}

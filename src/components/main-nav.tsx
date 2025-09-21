@@ -20,10 +20,10 @@ export function MainNav() {
   const pathname = usePathname();
   const menuItems = [
     { href: '/', label: 'Dashboard', icon: BarChart },
-    { href: '/carbon-suggestions', label: 'AI Suggestions', icon: Bot },
     { href: '/challenges', label: 'Challenges', icon: Gamepad2 },
     { href: '/schemes', label: 'Govt. Schemes', icon: Landmark },
     { href: '/blog', label: 'Blog', icon: Newspaper },
+    { href: '/carbon-suggestions', label: 'AI Suggestions', icon: Bot },
     { href: '/puzzle-game', label: 'Eco Word Scramble', icon: Puzzle },
     { href: '/situation-game', label: 'Eco Situation', icon: ClipboardCheck },
   ];

@@ -1,9 +1,12 @@
+'use client';
+
 import { AppLayout } from '@/components/app-layout';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { challenges } from '@/lib/data';
 import { Bot, Puzzle, BrainCircuit } from 'lucide-react';
 import Link from 'next/link';
+import { useToast } from '@/hooks/use-toast';
 
 const gameChallenges = [
     {
@@ -30,6 +33,15 @@ const gameChallenges = [
 ]
 
 export default function ChallengesPage() {
+  const { toast } = useToast();
+
+  const handleAcceptChallenge = (title: string, points: number) => {
+    toast({
+      title: 'Challenge Accepted!',
+      description: `You've accepted the "${title}" challenge. Good luck! You can earn ${points} points.`,
+    });
+  };
+
   return (
     <AppLayout>
       <div className="space-y-8">
@@ -76,7 +88,9 @@ export default function ChallengesPage() {
               <CardContent className="flex-grow"></CardContent>
               <CardFooter className="flex justify-between items-center">
                 <div className="font-bold text-primary">{challenge.points} Points</div>
-                <Button>Accept Challenge</Button>
+                <Button onClick={() => handleAcceptChallenge(challenge.title, challenge.points)}>
+                  Accept Challenge
+                </Button>
               </CardFooter>
             </Card>
           ))}

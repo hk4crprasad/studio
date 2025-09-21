@@ -1,5 +1,5 @@
 'use client';
-import { useState, useMemo } from 'react';
+import { useState, useEffect, useMemo, DragEvent } from 'react';
 import { AppLayout } from '@/components/app-layout';
 import { Button } from '@/components/ui/button';
 import {
@@ -10,93 +10,165 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/card';
-import { Input } from '@/components/ui/input';
 import { useToast } from '@/hooks/use-toast';
+import { CheckCircle, Award } from 'lucide-react';
+import Image from 'next/image';
+import { cn } from '@/lib/utils';
 
-const puzzles = [
-  { word: 'RECYCLE', hint: 'Process of converting waste into reusable material.' },
-  { word: 'SUSTAIN', hint: 'To maintain at a certain rate or level.' },
-  { word: 'COMPOST', hint: 'Decayed organic material used as a plant fertilizer.' },
-  { word: 'FOREST', hint: 'A large area covered chiefly with trees and undergrowth.' },
-];
+const PUZZLE_IMAGE_URL = 'https://picsum.photos/seed/puzzle-nature/400/400';
+const PUZZLE_SIZE = 400;
+const GRID_SIZE = 4;
+const PIECE_SIZE = PUZZLE_SIZE / GRID_SIZE;
 
-function shuffleWord(word: string) {
-  const a = word.split('');
-  const n = a.length;
+type Piece = {
+  id: number;
+  bgX: number;
+  bgY: number;
+};
 
-  for (let i = n - 1; i > 0; i--) {
-    const j = Math.floor(Math.random() * (i + 1));
-    [a[i], a[j]] = [a[j], a[i]];
+const createPieces = (): Piece[] => {
+  const pieces: Piece[] = [];
+  for (let i = 0; i < GRID_SIZE * GRID_SIZE; i++) {
+    pieces.push({
+      id: i,
+      bgX: (i % GRID_SIZE) * PIECE_SIZE,
+      bgY: Math.floor(i / GRID_SIZE) * PIECE_SIZE,
+    });
   }
-  return a.join('');
-}
+  return pieces;
+};
+
+const shufflePieces = (pieces: Piece[]): Piece[] => {
+    // A simple shuffle that is guaranteed to not be the original order
+    const shuffled = [...pieces].reverse(); 
+    if (JSON.stringify(shuffled) === JSON.stringify(pieces)) {
+        // In case of a very small grid (2x2), reverse might be the same
+        const a = shuffled[0];
+        shuffled[0] = shuffled[1];
+        shuffled[1] = a;
+    }
+    return shuffled;
+};
 
 export default function PuzzleGamePage() {
-  const [puzzleIndex, setPuzzleIndex] = useState(0);
-  const [userGuess, setUserGuess] = useState('');
+  const originalPieces = useMemo(() => createPieces(), []);
+  const [pieces, setPieces] = useState<Piece[]>([]);
+  const [isSolved, setIsSolved] = useState(false);
+  const [draggedPiece, setDraggedPiece] = useState<Piece | null>(null);
   const { toast } = useToast();
 
-  const currentPuzzle = puzzles[puzzleIndex];
-  const scrambledWord = useMemo(
-    () => shuffleWord(currentPuzzle.word),
-    [currentPuzzle.word]
-  );
+  useEffect(() => {
+    setPieces(shufflePieces(originalPieces));
+    setIsSolved(false);
+  }, [originalPieces]);
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (userGuess.toUpperCase() === currentPuzzle.word) {
+  useEffect(() => {
+    const checkSolved = () => {
+      if (pieces.length === 0) return false;
+      for (let i = 0; i < pieces.length; i++) {
+        if (pieces[i].id !== originalPieces[i].id) {
+          return false;
+        }
+      }
+      return true;
+    };
+
+    if (checkSolved()) {
+      setIsSolved(true);
       toast({
-        title: 'Correct!',
-        description: 'You solved the puzzle. Here is the next one!',
-      });
-      setUserGuess('');
-      setPuzzleIndex((prevIndex) => (prevIndex + 1) % puzzles.length);
-    } else {
-      toast({
-        variant: 'destructive',
-        title: 'Incorrect',
-        description: 'That is not the right word. Please try again.',
+        title: 'Congratulations!',
+        description: 'You solved the puzzle and earned 150 points!',
       });
     }
+  }, [pieces, originalPieces, toast]);
+
+  const handleDragStart = (piece: Piece) => {
+    setDraggedPiece(piece);
   };
+
+  const handleDrop = (targetPiece: Piece) => {
+    if (!draggedPiece) return;
+
+    const newPieces = [...pieces];
+    const draggedIndex = pieces.findIndex(p => p.id === draggedPiece.id);
+    const targetIndex = pieces.findIndex(p => p.id === targetPiece.id);
+
+    // Swap the pieces
+    newPieces[draggedIndex] = targetPiece;
+    newPieces[targetIndex] = draggedPiece;
+
+    setPieces(newPieces);
+    setDraggedPiece(null);
+  };
+  
+  const handleDragOver = (e: DragEvent<HTMLDivElement>) => {
+    e.preventDefault(); // Necessary to allow dropping
+  };
+
+  const resetPuzzle = () => {
+    setPieces(shufflePieces(originalPieces));
+    setIsSolved(false);
+  }
 
   return (
     <AppLayout>
       <div className="space-y-8">
         <header>
           <h2 className="text-3xl font-bold tracking-tight font-headline">
-            Eco Puzzle Challenge
+            Eco Jigsaw Puzzle
           </h2>
           <p className="text-muted-foreground mt-1">
-            Unscramble the letters to find the eco-friendly word!
+            Drag and drop the pieces to solve the puzzle and reveal a beautiful nature scene.
           </p>
         </header>
 
-        <Card className="max-w-md mx-auto">
+        <Card className="max-w-xl mx-auto">
           <CardHeader>
-            <CardTitle className="font-headline text-center text-4xl tracking-widest">
-              {scrambledWord}
+            <CardTitle className="font-headline text-center">
+              Complete the Image
             </CardTitle>
-            <CardDescription className="text-center pt-2">
-              Hint: {currentPuzzle.hint}
+            <CardDescription className="text-center">
+                {isSolved ? "You did it! A beautiful landscape restored." : "Unscramble the pieces to see the full picture."}
             </CardDescription>
           </CardHeader>
-          <form onSubmit={handleSubmit}>
-            <CardContent>
-              <Input
-                type="text"
-                value={userGuess}
-                onChange={(e) => setUserGuess(e.target.value)}
-                placeholder="Your answer"
-                className="text-center text-lg h-12"
-              />
-            </CardContent>
-            <CardFooter>
-              <Button type="submit" className="w-full">
-                Submit Guess
-              </Button>
+          <CardContent className="flex justify-center">
+             <div 
+                className="grid gap-1 bg-muted p-2 rounded-lg shadow-inner"
+                style={{
+                    gridTemplateColumns: `repeat(${GRID_SIZE}, ${PIECE_SIZE}px)`,
+                    width: PUZZLE_SIZE + 8,
+                }}
+             >
+                {pieces.map((piece) => (
+                    <div
+                        key={piece.id}
+                        draggable={!isSolved}
+                        onDragStart={() => handleDragStart(piece)}
+                        onDrop={() => handleDrop(piece)}
+                        onDragOver={handleDragOver}
+                        className={cn(
+                          'bg-cover bg-no-repeat rounded-sm transition-all duration-300',
+                          !isSolved && 'cursor-grab active:cursor-grabbing hover:opacity-80'
+                        )}
+                        style={{
+                            width: PIECE_SIZE,
+                            height: PIECE_SIZE,
+                            backgroundImage: `url(${PUZZLE_IMAGE_URL})`,
+                            backgroundPosition: `-${piece.bgX}px -${piece.bgY}px`,
+                        }}
+                    />
+                ))}
+            </div>
+          </CardContent>
+          {isSolved && (
+            <CardFooter className="flex flex-col gap-4 items-center text-center">
+                 <div className="flex items-center gap-2 text-primary font-bold text-lg">
+                    <Award />
+                    <span>150 Points Rewarded!</span>
+                </div>
+                <Button onClick={resetPuzzle}>Play Again</Button>
             </CardFooter>
-          </form>
+          )}
         </Card>
       </div>
     </AppLayout>

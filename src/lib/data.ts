@@ -1,4 +1,4 @@
-import { Car, Droplets, Landmark, Recycle, Trash2, Trees, Zap } from 'lucide-react';
+import { Car, Droplets, Landmark, Recycle, Trash2, Trees, Zap, Sun, Award } from 'lucide-react';
 import { PlaceHolderImages } from './placeholder-images';
 
 export const challenges = [
@@ -45,26 +45,44 @@ export const schemes = [
     id: 'scheme-1',
     name: 'National Afforestation Programme (NAP)',
     description:
-      'The National Afforestation Programme (NAP) is a flagship scheme of the Ministry of Environment, Forest and Climate Change for afforestation of degraded forest lands. It is being implemented through a decentralized mechanism of State Forest Development Agency (SFDA) at the state level, Forest Development Agency (FDA) at the forest division level, and Joint Forest Management Committees (JFMCs) at the village level.',
+      'The National Afforestation Programme (NAP) is a flagship scheme for afforestation of degraded forest lands. It is implemented through State Forest Development Agencies, Forest Development Agencies, and Joint Forest Management Committees at the village level to promote reforestation and ecological restoration.',
   },
   {
     id: 'scheme-2',
-    name: 'Pradhan Mantri Kisan Urja Suraksha evam Utthaan Mahabhiyan (PM-KUSUM)',
-    description:
-      'The PM-KUSUM scheme aims to enhance income for farmers and provide a reliable source for irrigation. It promotes the installation of solar-powered agriculture pumps and setting up of grid-connected solar power plants in rural areas.',
+    name: 'Solar Rooftop Subsidy Programme',
+    description: 
+      'Under this scheme, the government provides financial assistance for installing rooftop solar panels on residential houses. Homeowners can receive a subsidy for systems up to 10 kW, significantly reducing the initial setup cost and leading to lower electricity bills. The subsidy amount varies based on the system capacity.'
   },
   {
     id: 'scheme-3',
-    name: 'Swachh Bharat Mission',
+    name: 'PM-KUSUM Scheme',
     description:
-      'A country-wide campaign initiated by the Government of India in 2014 to eliminate open defecation and improve solid waste management. It is a major step towards creating a cleaner and more sustainable India.',
+      'The Pradhan Mantri Kisan Urja Suraksha evam Utthaan Mahabhiyan (PM-KUSUM) scheme aims to increase income for farmers by providing a reliable source for irrigation. It promotes the installation of solar-powered agriculture pumps and the setup of grid-connected solar power plants in rural areas, encouraging the use of renewable energy in agriculture.',
   },
   {
     id: 'scheme-4',
+    name: 'FAME India Scheme',
+    description:
+      'The Faster Adoption and Manufacturing of (Hybrid &) Electric Vehicles in India (FAME) scheme encourages the adoption of electric and hybrid vehicles. It provides upfront incentives on the purchase of electric vehicles, making them more affordable for consumers and helping to reduce air pollution and dependency on fossil fuels.'
+  },
+  {
+    id: 'scheme-5',
+    name: 'Swachh Bharat Mission',
+    description:
+      'A country-wide campaign to eliminate open defecation and improve solid waste management. It is a major step towards creating a cleaner India by promoting hygiene, waste segregation, and community participation in cleanliness drives.',
+  },
+  {
+    id: 'scheme-6',
     name: 'National Clean Air Programme (NCAP)',
     description:
-      'NCAP is a long-term, time-bound, national level strategy to tackle the air pollution problem across the country in a comprehensive manner. It targets to achieve a 20% to 30% reduction in Particulate Matter concentrations by 2024 keeping 2017 as the base year for the comparison of concentration.',
+      'NCAP is a national-level strategy to tackle air pollution. It aims for a 20% to 30% reduction in Particulate Matter (PM) concentrations by 2024, with 2017 as the base year. The programme focuses on creating action plans for cities to improve air quality through monitoring and control measures.',
   },
+   {
+    id: 'scheme-7',
+    name: 'Jal Jeevan Mission',
+    description:
+      'This mission aims to provide safe and adequate drinking water through individual household tap connections to all households in rural India by 2024. It promotes water conservation efforts and sustainable water source management, which is crucial for environmental balance and public health.',
+  }
 ];
 
 export const articles = [

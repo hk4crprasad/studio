@@ -4,7 +4,7 @@ import { AppLayout } from '@/components/app-layout';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { challenges } from '@/lib/data';
-import { Bot, Puzzle, BrainCircuit, Recycle } from 'lucide-react';
+import { Bot, Puzzle, BrainCircuit, Recycle, BookMarked } from 'lucide-react';
 import Link from 'next/link';
 import { useToast } from '@/hooks/use-toast';
 
@@ -36,6 +36,13 @@ const gameChallenges = [
         points: 10,
         icon: BrainCircuit,
         href: '/carbon-quiz',
+    },
+    {
+      title: 'Eco-Story Generator',
+      description: 'Complete an AI-generated story about forestation to learn about its impact.',
+      points: 20,
+      icon: BookMarked,
+      href: '/eco-story-game',
     }
 ]
 

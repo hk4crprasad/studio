@@ -15,6 +15,7 @@ import {
   BrainCircuit,
   ShoppingCart,
   Recycle,
+  BookMarked,
 } from 'lucide-react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
@@ -32,6 +33,7 @@ export function MainNav() {
     { href: '/situation-game', label: 'Eco Situation', icon: ClipboardCheck },
     { href: '/carbon-quiz', label: 'Carbon IQ Challenge', icon: BrainCircuit },
     { href: '/garbage-sorting-game', label: 'Garbage Sorting', icon: Recycle },
+    { href: '/eco-story-game', label: 'Eco-Story Game', icon: BookMarked },
   ];
 
   return (

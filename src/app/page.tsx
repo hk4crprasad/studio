@@ -1,9 +1,10 @@
+'use client';
 import { AppLayout } from '@/components/app-layout';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { BarChart as BarChartIcon, Bot, Gamepad2, TrendingUp } from 'lucide-react';
-import { ChartContainer, ChartTooltip, ChartTooltipContent, Bar, XAxis, YAxis } from '@/components/ui/chart';
-import { BarChart } from 'recharts';
+import { ChartContainer, ChartTooltip, ChartTooltipContent } from '@/components/ui/chart';
+import { BarChart, Bar, XAxis, YAxis } from 'recharts';
 import Link from 'next/link';
 import { Progress } from '@/components/ui/progress';
 

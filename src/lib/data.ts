@@ -42,52 +42,59 @@ export const challenges = [
 
 export const schemes = [
   {
-    id: 'scheme-1',
-    name: 'National Afforestation Programme (NAP)',
-    description:
-      'The National Afforestation Programme (NAP) is a flagship scheme for afforestation of degraded forest lands. It is implemented through State Forest Development Agencies, Forest Development Agencies, and Joint Forest Management Committees at the village level to promote reforestation and ecological restoration.',
-    link: 'https://moef.gov.in/en/division/forest-protection-and-restoration-division-fp-division/national-afforestation-programme-nap/',
-  },
-  {
     id: 'scheme-2',
     name: 'Solar Rooftop Subsidy Programme',
     description: 
-      'Under this scheme, the government provides financial assistance for installing rooftop solar panels on residential houses. Homeowners can receive a subsidy for systems up to 10 kW, significantly reducing the initial setup cost and leading to lower electricity bills. The subsidy amount varies based on the system capacity.',
+      'Install rooftop solar panels on residential houses and reduce electricity bills. This programme promotes renewable energy adoption at the household level.',
+    subsidy: 'Subsidy for residential systems up to 10 kW. The amount varies based on the system capacity and location.',
     link: 'https://solarrooftop.gov.in/',
-  },
-  {
-    id: 'scheme-3',
-    name: 'PM-KUSUM Scheme',
-    description:
-      'The Pradhan Mantri Kisan Urja Suraksha evam Utthaan Mahabhiyan (PM-KUSUM) scheme aims to increase income for farmers by providing a reliable source for irrigation. It promotes the installation of solar-powered agriculture pumps and the setup of grid-connected solar power plants in rural areas, encouraging the use of renewable energy in agriculture.',
-    link: 'https://pmkusum.mnre.gov.in/',
   },
   {
     id: 'scheme-4',
     name: 'FAME India Scheme',
     description:
-      'The Faster Adoption and Manufacturing of (Hybrid &) Electric Vehicles in India (FAME) scheme encourages the adoption of electric and hybrid vehicles. It provides upfront incentives on the purchase of electric vehicles, making them more affordable for consumers and helping to reduce air pollution and dependency on fossil fuels.',
+      'The Faster Adoption and Manufacturing of (Hybrid &) Electric Vehicles (FAME) scheme encourages the adoption of electric and hybrid vehicles.',
+    subsidy: 'Provides upfront incentives on the purchase of electric vehicles, making them more affordable and helping to reduce air pollution.',
     link: 'https://fame2.heavyindustries.gov.in/',
+  },
+  {
+    id: 'scheme-3',
+    name: 'PM-KUSUM Scheme',
+    description:
+      'This scheme helps farmers install solar-powered agriculture pumps and set up grid-connected solar power plants in rural areas.',
+    subsidy: 'Provides financial assistance and subsidies to farmers for installing solar pumps, promoting renewable energy in agriculture.',
+    link: 'https://pmkusum.mnre.gov.in/',
+  },
+  {
+    id: 'scheme-1',
+    name: 'National Afforestation Programme (NAP)',
+    description:
+      'A flagship scheme for afforestation of degraded forest lands. It promotes reforestation and ecological restoration through community participation.',
+    subsidy: 'Funding is provided to state forest development agencies for implementation. Benefits are ecological rather than direct financial aid to individuals.',
+    link: 'https://moef.gov.in/en/division/forest-protection-and-restoration-division-fp-division/national-afforestation-programme-nap/',
   },
   {
     id: 'scheme-5',
     name: 'Swachh Bharat Mission',
     description:
-      'A country-wide campaign to eliminate open defecation and improve solid waste management. It is a major step towards creating a cleaner India by promoting hygiene, waste segregation, and community participation in cleanliness drives.',
+      'A country-wide campaign to eliminate open defecation and improve solid waste management, aiming to create a cleaner India.',
+    subsidy: 'Focuses on building community and public toilets and promoting civic sense. Direct financial subsidies are available for toilet construction.',
     link: 'https://swachhbharatmission.gov.in/',
   },
   {
     id: 'scheme-6',
     name: 'National Clean Air Programme (NCAP)',
     description:
-      'NCAP is a national-level strategy to tackle air pollution. It aims for a 20% to 30% reduction in Particulate Matter (PM) concentrations by 2024, with 2017 as the base year. The programme focuses on creating action plans for cities to improve air quality through monitoring and control measures.',
+      'NCAP is a national-level strategy to tackle air pollution across the country, with a goal to reduce particulate matter concentrations.',
+    subsidy: 'Funds are allocated to cities to implement action plans for air quality improvement. This is an indirect benefit to citizens through a healthier environment.',
     link: 'https://prana.cpcb.gov.in/#/login',
   },
    {
     id: 'scheme-7',
     name: 'Jal Jeevan Mission',
     description:
-      'This mission aims to provide safe and adequate drinking water through individual household tap connections to all households in rural India by 2024. It promotes water conservation efforts and sustainable water source management, which is crucial for environmental balance and public health.',
+      'This mission aims to provide safe and adequate drinking water through individual household tap connections to all households in rural India.',
+    subsidy: 'Focuses on infrastructure development to provide tap water, a fundamental necessity. The benefit is access to clean water rather than a direct subsidy.',
     link: 'https://jaljeevanmission.gov.in/',
   }
 ];

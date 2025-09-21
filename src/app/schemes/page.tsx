@@ -1,14 +1,16 @@
 import { AppLayout } from '@/components/app-layout';
-import {
-  Accordion,
-  AccordionContent,
-  AccordionItem,
-  AccordionTrigger,
-} from '@/components/ui/accordion';
-import { schemes } from '@/lib/data';
 import { Button } from '@/components/ui/button';
-import Link from 'next/link';
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from '@/components/ui/card';
+import { schemes } from '@/lib/data';
 import { ExternalLink } from 'lucide-react';
+import Link from 'next/link';
 
 export default function SchemesPage() {
   return (
@@ -23,24 +25,32 @@ export default function SchemesPage() {
           </p>
         </header>
 
-        <Accordion type="single" collapsible className="w-full">
+        <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
           {schemes.map((scheme) => (
-            <AccordionItem value={scheme.id} key={scheme.id}>
-              <AccordionTrigger className="font-headline text-left text-lg hover:no-underline">
-                {scheme.name}
-              </AccordionTrigger>
-              <AccordionContent className="text-base space-y-4">
-                <p>{scheme.description}</p>
-                <Button asChild>
+            <Card key={scheme.id} className="flex flex-col">
+              <CardHeader>
+                <CardTitle className="font-headline text-lg">{scheme.name}</CardTitle>
+              </CardHeader>
+              <CardContent className="flex-grow space-y-4">
+                <p className="text-sm text-muted-foreground">{scheme.description}</p>
+                {scheme.subsidy && (
+                    <div>
+                        <h4 className="font-semibold text-sm mb-1">Benefit/Subsidy</h4>
+                        <p className="text-sm">{scheme.subsidy}</p>
+                    </div>
+                )}
+              </CardContent>
+              <CardFooter>
+                 <Button asChild className="w-full">
                   <Link href={scheme.link} target="_blank">
                     <ExternalLink className="mr-2" />
                     Apply Now
                   </Link>
                 </Button>
-              </AccordionContent>
-            </AccordionItem>
+              </CardFooter>
+            </Card>
           ))}
-        </Accordion>
+        </div>
       </div>
     </AppLayout>
   );

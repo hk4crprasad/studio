@@ -73,6 +73,12 @@ export default function CarbonQuizPage() {
     setIsGameComplete(false);
     try {
       const result = await generateCarbonQuiz({ count: 10, language: lang });
+      console.log('Quiz generation result:', result);
+      
+      if (!result || !result.questions || !Array.isArray(result.questions)) {
+        throw new Error('Invalid response from quiz generation API');
+      }
+      
       const shuffledQuestions = result.questions.map(question => ({
         ...question,
         options: shuffleArray(question.options)

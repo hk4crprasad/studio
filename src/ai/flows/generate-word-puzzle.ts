@@ -1,66 +1,56 @@
 'use server';
 
 /**
- * @fileOverview This file defines a Genkit flow for generating a word puzzle.
+ * @fileOverview This file defines a flow for generating a word puzzle.
  *
  * The flow takes a theme and generates a word and a hint for a word scramble game.
  */
 
-import {ai} from '@/ai/genkit';
-import {z} from 'genkit';
+import { generateStructuredCompletion } from '@/lib/azure-openai';
 
-const WordPuzzleInputSchema = z.object({
-  theme: z
-    .string()
-    .describe('The theme for the word puzzle (e.g., sustainability, recycling, civic sense, waste management, carbon emission).'),
-  count: z.number().int().positive().describe('The number of puzzles to generate.'),
-  language: z.string().describe('The language for the puzzle (e.g., "English", "Hindi", "Bengali", "Odia").'),
-});
-export type WordPuzzleInput = z.infer<typeof WordPuzzleInputSchema>;
+export interface WordPuzzleInput {
+  theme: string;
+  count: number;
+  language: string;
+}
 
-const WordPuzzleSchema = z.object({
-  word: z
-    .string()
-    .describe('A single, relevant word for the puzzle, in uppercase.'),
-  hint: z.string().describe('A short hint or clue for the word.'),
-  explanation: z.string().describe('A short, one-sentence explanation of what the word means in the context of the theme.'),
-});
+export interface WordPuzzle {
+  word: string;
+  hint: string;
+  explanation: string;
+}
 
-const WordPuzzleOutputSchema = z.object({
-  puzzles: z.array(WordPuzzleSchema),
-});
-export type WordPuzzleOutput = z.infer<typeof WordPuzzleOutputSchema>;
+export interface WordPuzzleOutput {
+  puzzles: WordPuzzle[];
+}
 
 export async function generateWordPuzzles(
   input: WordPuzzleInput
 ): Promise<WordPuzzleOutput> {
-  return generateWordPuzzleFlow(input);
+  const { theme, count, language } = input;
+
+  const prompt = `You are a creative game master. Generate ${count} unique word puzzles in ${language} based on the theme of ${theme}. The themes can include sustainability, civic sense, waste management, and carbon emission reduction.
+
+For each puzzle, provide:
+1. A single, relevant word between 6 and 10 letters long, in uppercase.
+2. A short hint or clue for the word.
+3. A short, one-sentence "Did you know?" style explanation of what the word means in the context of the theme. For example: "Carpooling is when multiple people travel together in one car to reduce traffic and emissions."`;
+
+  const schema = `{
+  "puzzles": [
+    {
+      "word": "string - A single, relevant word for the puzzle, in uppercase",
+      "hint": "string - A short hint or clue for the word",
+      "explanation": "string - A short, one-sentence explanation of what the word means in the context of the theme"
+    }
+  ]
+}`;
+
+  const systemMessage = 'You are a creative educational game designer who specializes in environmental and sustainability topics.';
+
+  return await generateStructuredCompletion<WordPuzzleOutput>(
+    prompt,
+    schema,
+    { systemMessage, temperature: 1 }
+  );
 }
-
-const generateWordPuzzlePrompt = ai.definePrompt({
-  name: 'generateWordPuzzlePrompt',
-  input: {schema: WordPuzzleInputSchema},
-  output: {schema: WordPuzzleOutputSchema},
-  config: {
-    temperature: 1.0,
-  },
-  prompt: `You are a creative game master. Generate {{{count}}} unique word puzzles in {{{language}}} based on the theme of {{{theme}}}. The themes can include sustainability, civic sense, waste management, and carbon emission reduction.
-
-  For each puzzle, provide:
-  1. A single, relevant word between 6 and 10 letters long, in uppercase.
-  2. A short hint or clue for the word.
-  3. A short, one-sentence "Did you know?" style explanation of what the word means in the context of the theme. For example: "Carpooling is when multiple people travel together in one car to reduce traffic and emissions."
-  `,
-});
-
-const generateWordPuzzleFlow = ai.defineFlow(
-  {
-    name: 'generateWordPuzzleFlow',
-    inputSchema: WordPuzzleInputSchema,
-    outputSchema: WordPuzzleOutputSchema,
-  },
-  async input => {
-    const {output} = await generateWordPuzzlePrompt(input);
-    return output!;
-  }
-);

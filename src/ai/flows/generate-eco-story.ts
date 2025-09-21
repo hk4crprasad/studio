@@ -1,108 +1,86 @@
 'use server';
 
 /**
- * @fileOverview Defines Genkit flows for an interactive eco-story game.
+ * @fileOverview Defines flows for an interactive eco-story game.
  *
  * - generateEcoStory: Creates a fill-in-the-blanks story about a given theme.
  * - evaluateEcoStory: Evaluates the user's completed story and provides feedback.
  */
 
-import { ai } from '@/ai/genkit';
-import { z } from 'genkit';
+import { generateStructuredCompletion, generateCompletion } from '@/lib/azure-openai';
 
 // Schema for generating the story
-const EcoStoryInputSchema = z.object({
-  theme: z.string().describe('The environmental theme for the story (e.g., forestation, water conservation).'),
-  language: z.string().describe('The language for the story (e.g., "English", "Hindi", "Bengali", "Odia").'),
-});
-export type EcoStoryInput = z.infer<typeof EcoStoryInputSchema>;
+export interface EcoStoryInput {
+  theme: string;
+  language: string;
+}
 
-const EcoStoryOutputSchema = z.object({
-  title: z.string().describe('A catchy title for the story.'),
-  storyTemplate: z.string().describe('The story text with numbered placeholders for blanks, like "[1]", "[2]", etc.'),
-  correctWords: z.array(z.string()).describe('An array of the correct words that fit into the story blanks, in order.'),
-  incorrectWords: z.array(z.string()).describe('An array of incorrect but plausible words to act as distractors.'),
-});
-export type EcoStoryOutput = z.infer<typeof EcoStoryOutputSchema>;
+export interface EcoStoryOutput {
+  title: string;
+  storyTemplate: string;
+  correctWords: string[];
+  incorrectWords: string[];
+}
 
 // Schema for evaluating the completed story
-const EvaluateStoryInputSchema = z.object({
-  story: z.string().describe("The user's completed story."),
-  language: z.string().describe('The language of the story (e.g., "English", "Hindi", "Bengali", "Odia").'),
-});
-export type EvaluateStoryInput = z.infer<typeof EvaluateStoryInputSchema>;
+export interface EvaluateStoryInput {
+  story: string;
+  language: string;
+}
 
-const EvaluateStoryOutputSchema = z.object({
-  evaluation: z.string().describe("Feedback on the user's choices and a conclusion to the story, explaining the environmental impact."),
-});
-export type EvaluateStoryOutput = z.infer<typeof EvaluateStoryOutputSchema>;
-
+export interface EvaluateStoryOutput {
+  evaluation: string;
+}
 
 // Exported functions to be called from the client
 export async function generateEcoStory(input: EcoStoryInput): Promise<EcoStoryOutput> {
-  return generateEcoStoryFlow(input);
-}
+  const { theme, language } = input;
 
-export async function evaluateEcoStory(input: EvaluateStoryInput): Promise<EvaluateStoryOutput> {
-  return evaluateEcoStoryFlow(input);
-}
-
-
-// Flow for generating the story
-const generateEcoStoryPrompt = ai.definePrompt({
-  name: 'generateEcoStoryPrompt',
-  input: { schema: EcoStoryInputSchema },
-  output: { schema: EcoStoryOutputSchema },
-  prompt: `You are a creative storyteller and environmental educator. Create a short, engaging, fill-in-the-blanks story for a game in {{{language}}} based on the theme of {{{theme}}}.
+  const prompt = `You are a creative storyteller and environmental educator. Create a short, engaging, fill-in-the-blanks story for a game in ${language} based on the theme of ${theme}.
 
 The story should be a few paragraphs long and have between 4 and 6 blanks. Represent the blanks with numbered placeholders (e.g., "[1]", "[2]").
 
 - Provide a catchy title for the story.
 - Provide the story template.
 - Provide the array of correct words that perfectly fit the blanks in order. The words should be relevant to the theme.
-- Provide an array of incorrect words. These should be plausible distractors that are contextually related but wrong. The number of incorrect words should be equal to the number of correct words.
-`,
-});
+- Provide an array of incorrect words. These should be plausible distractors that are contextually related but wrong. The number of incorrect words should be equal to the number of correct words.`;
 
-const generateEcoStoryFlow = ai.defineFlow(
-  {
-    name: 'generateEcoStoryFlow',
-    inputSchema: EcoStoryInputSchema,
-    outputSchema: EcoStoryOutputSchema,
-  },
-  async (input) => {
-    const { output } = await generateEcoStoryPrompt(input);
-    return output!;
-  }
-);
+  const schema = `{
+  "title": "string - A catchy title for the story",
+  "storyTemplate": "string - The story text with numbered placeholders for blanks, like '[1]', '[2]', etc.",
+  "correctWords": ["string"] - An array of the correct words that fit into the story blanks, in order,
+  "incorrectWords": ["string"] - An array of incorrect but plausible words to act as distractors
+}`;
 
+  const systemMessage = 'You are a creative environmental educator who creates engaging educational content about sustainability topics.';
 
-// Flow for evaluating the story
-const evaluateEcoStoryPrompt = ai.definePrompt({
-  name: 'evaluateEcoStoryPrompt',
-  input: { schema: EvaluateStoryInputSchema },
-  output: { schema: EvaluateStoryOutputSchema },
-  prompt: `You are an environmental expert. The user has completed a fill-in-the-blanks story in {{{language}}}.
+  return await generateStructuredCompletion<EcoStoryOutput>(
+    prompt,
+    schema,
+    { systemMessage, temperature: 1 }
+  );
+}
+
+export async function evaluateEcoStory(input: EvaluateStoryInput): Promise<EvaluateStoryOutput> {
+  const { story, language } = input;
+
+  const prompt = `You are an environmental expert. The user has completed a fill-in-the-blanks story in ${language}.
 
 User's completed story:
-"{{{story}}}"
+"${story}"
 
-Based on the choices the user filled in, provide a concluding paragraph in {{{language}}}.
+Based on the choices the user filled in, provide a concluding paragraph in ${language}.
 - Evaluate the choices made (even if they are incorrect distractors).
 - Explain the environmental impact of the correct actions.
 - If the user made wrong choices, gently correct them and explain the better alternative.
-- Make the tone encouraging and educational.
-`,
-});
+- Make the tone encouraging and educational.`;
 
-const evaluateEcoStoryFlow = ai.defineFlow(
-  {
-    name: 'evaluateEcoStoryFlow',
-    inputSchema: EvaluateStoryInputSchema,
-    outputSchema: EvaluateStoryOutputSchema,
-  },
-  async (input) => {
-    const { output } = await evaluateEcoStoryPrompt(input);
-    return output!;
-  }
-);
+  const systemMessage = 'You are an encouraging environmental educator who provides constructive feedback on sustainability choices.';
+
+  const evaluation = await generateCompletion(
+    prompt,
+    { systemMessage, temperature: 1 }
+  );
+
+  return { evaluation };
+}

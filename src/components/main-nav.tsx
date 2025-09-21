@@ -12,6 +12,7 @@ import {
   Newspaper,
   Puzzle,
   ClipboardCheck,
+  BrainCircuit,
 } from 'lucide-react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
@@ -26,6 +27,7 @@ export function MainNav() {
     { href: '/carbon-suggestions', label: 'AI Suggestions', icon: Bot },
     { href: '/puzzle-game', label: 'Eco Word Scramble', icon: Puzzle },
     { href: '/situation-game', label: 'Eco Situation', icon: ClipboardCheck },
+    { href: '/carbon-quiz', label: 'Carbon IQ Challenge', icon: BrainCircuit },
   ];
 
   return (

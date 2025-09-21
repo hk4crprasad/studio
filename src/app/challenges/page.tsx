@@ -2,7 +2,7 @@ import { AppLayout } from '@/components/app-layout';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { challenges } from '@/lib/data';
-import { Bot, Puzzle } from 'lucide-react';
+import { Bot, Puzzle, BrainCircuit } from 'lucide-react';
 import Link from 'next/link';
 
 const gameChallenges = [
@@ -19,6 +19,13 @@ const gameChallenges = [
         points: 10,
         icon: Bot,
         href: '/situation-game',
+    },
+    {
+        title: 'Carbon IQ Challenge',
+        description: 'Test your knowledge on carbon emission reduction practices with this AI quiz.',
+        points: 10,
+        icon: BrainCircuit,
+        href: '/carbon-quiz',
     }
 ]
 

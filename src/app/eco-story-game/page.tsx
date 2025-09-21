@@ -129,15 +129,17 @@ export default function EcoStoryGamePage() {
 
   return (
     <AppLayout>
-      <AlertDialog open={!!evaluation} onOpenChange={() => !evaluation && loadNewStory()}>
+      <AlertDialog open={!!evaluation} onOpenChange={(isOpen) => !isOpen && setEvaluation(null)}>
           <AlertDialogContent>
               <AlertDialogHeader className="items-center text-center">
                   <PartyPopper className="w-16 h-16 text-primary" />
                   <AlertDialogTitle className="font-headline text-3xl">Story Complete!</AlertDialogTitle>
-                  <AlertDialogDescription className="prose text-left text-base p-4">
+                  <div className="prose text-left text-base p-4">
                     <h4 className="font-headline text-lg">AI Evaluation:</h4>
-                    <p>{evaluation}</p>
-                  </AlertDialogDescription>
+                    <AlertDialogDescription>
+                      {evaluation}
+                    </AlertDialogDescription>
+                  </div>
               </AlertDialogHeader>
               <AlertDialogFooter>
                   <Button onClick={loadNewStory} className="w-full">

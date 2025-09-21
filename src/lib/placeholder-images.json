@@ -1,3 +1,29 @@
+
 {
-  "placeholderImages": []
+  "placeholderImages": [
+    {
+      "id": "blog-climate-change",
+      "description": "An article about climate change.",
+      "imageUrl": "https://picsum.photos/seed/climate/600/400",
+      "imageHint": "climate change"
+    },
+    {
+      "id": "blog-deforestation",
+      "description": "An article about the effects of deforestation.",
+      "imageUrl": "https://picsum.photos/seed/forest/600/400",
+      "imageHint": "deforestation"
+    },
+    {
+      "id": "blog-urbanization",
+      "description": "An article discussing sustainable urbanization.",
+      "imageUrl": "https://picsum.photos/seed/city/600/400",
+      "imageHint": "city sustainable"
+    },
+    {
+      "id": "blog-renewable-energy",
+      "description": "An article on the rise of renewable energy.",
+      "imageUrl": "https://picsum.photos/seed/renewable/600/400",
+      "imageHint": "wind turbine"
+    }
+  ]
 }

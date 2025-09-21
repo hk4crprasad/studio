@@ -21,6 +21,13 @@ import {
   AlertDialogHeader,
   AlertDialogTitle
 } from "@/components/ui/alert-dialog";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { cn } from '@/lib/utils';
 
 type Scenario = EcoSituation;
@@ -41,6 +48,13 @@ const shuffleArray = <T,>(array: T[]): T[] => {
     return newArray;
 }
 
+const languages = [
+  { value: 'English', label: 'English' },
+  { value: 'Hindi', label: 'हिंदी' },
+  { value: 'Bengali', label: 'বাংলা' },
+  { value: 'Odia', label: 'ଓଡ଼ିଆ' },
+];
+
 
 export default function SituationGamePage() {
   const [scenarios, setScenarios] = useState<Scenario[]>([]);
@@ -49,9 +63,10 @@ export default function SituationGamePage() {
   const [isLoading, setIsLoading] = useState(true);
   const [score, setScore] = useState(0);
   const [isGameComplete, setIsGameComplete] = useState(false);
+  const [language, setLanguage] = useState('English');
   const { toast } = useToast();
 
-  const loadNewScenarios = async () => {
+  const loadNewScenarios = async (lang: string) => {
     setIsLoading(true);
     setSelectedOption(null);
     setScenarios([]);
@@ -59,7 +74,7 @@ export default function SituationGamePage() {
     setScore(0);
     setIsGameComplete(false);
     try {
-      const result = await generateEcoSituations({ theme: 'everyday sustainability', count: 10 });
+      const result = await generateEcoSituations({ theme: 'everyday sustainability', count: 10, language: lang });
       const shuffledScenarios = result.scenarios.map(scenario => ({
         ...scenario,
         options: shuffleArray(scenario.options)
@@ -78,8 +93,12 @@ export default function SituationGamePage() {
   };
 
   useEffect(() => {
-    loadNewScenarios();
-  }, []);
+    loadNewScenarios(language);
+  }, [language]);
+
+  const handleLanguageChange = (lang: string) => {
+    setLanguage(lang);
+  };
 
   const handleOptionSelect = (index: number) => {
     setSelectedOption(index);
@@ -107,7 +126,7 @@ export default function SituationGamePage() {
   };
 
   const handlePlayAgain = () => {
-    loadNewScenarios();
+    loadNewScenarios(language);
   }
 
   const currentScenario = scenarios[currentScenarioIndex];
@@ -139,13 +158,27 @@ export default function SituationGamePage() {
       </AlertDialog>
 
       <div className="space-y-8">
-        <header>
-          <h2 className="text-3xl font-bold tracking-tight font-headline">
-            AI Eco Situation Simulator
-          </h2>
-          <p className="text-muted-foreground mt-1">
-           {scenarios.length > 0 ? `Make the most sustainable choice. (${currentScenarioIndex + 1} of ${scenarios.length})` : 'Loading scenarios...'}
-          </p>
+        <header className="flex justify-between items-center">
+          <div>
+            <h2 className="text-3xl font-bold tracking-tight font-headline">
+              AI Eco Situation Simulator
+            </h2>
+            <p className="text-muted-foreground mt-1">
+            {scenarios.length > 0 ? `Make the most sustainable choice. (${currentScenarioIndex + 1} of ${scenarios.length})` : 'Loading scenarios...'}
+            </p>
+          </div>
+           <div className="w-48">
+            <Select onValueChange={handleLanguageChange} defaultValue={language}>
+              <SelectTrigger>
+                <SelectValue placeholder="Select language" />
+              </SelectTrigger>
+              <SelectContent>
+                {languages.map((lang) => (
+                  <SelectItem key={lang.value} value={lang.value}>{lang.label}</SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
         </header>
 
         <Card className="max-w-2xl mx-auto">

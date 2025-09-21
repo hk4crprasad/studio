@@ -14,6 +14,7 @@ const WordPuzzleInputSchema = z.object({
     .string()
     .describe('The theme for the word puzzle (e.g., sustainability, recycling, civic sense, waste management, carbon emission).'),
   count: z.number().int().positive().describe('The number of puzzles to generate.'),
+  language: z.string().describe('The language for the puzzle (e.g., "English", "Hindi", "Bengali", "Odia").'),
 });
 export type WordPuzzleInput = z.infer<typeof WordPuzzleInputSchema>;
 
@@ -43,7 +44,7 @@ const generateWordPuzzlePrompt = ai.definePrompt({
   config: {
     temperature: 1.0,
   },
-  prompt: `You are a creative game master. Generate {{{count}}} unique word puzzles based on the theme of {{{theme}}}. The themes can include sustainability, civic sense, waste management, and carbon emission reduction.
+  prompt: `You are a creative game master. Generate {{{count}}} unique word puzzles in {{{language}}} based on the theme of {{{theme}}}. The themes can include sustainability, civic sense, waste management, and carbon emission reduction.
 
   For each puzzle, provide:
   1. A single, relevant word between 6 and 10 letters long, in uppercase.

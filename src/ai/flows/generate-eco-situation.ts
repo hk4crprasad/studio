@@ -31,6 +31,7 @@ const EcoSituationsInputSchema = z.object({
     .int()
     .positive()
     .describe('The number of situations to generate.'),
+    language: z.string().describe('The language for the scenarios (e.g., "English", "Hindi", "Bengali", "Odia").'),
 });
 export type EcoSituationsInput = z.infer<typeof EcoSituationsInputSchema>;
 
@@ -51,7 +52,7 @@ const generateEcoSituationsPrompt = ai.definePrompt({
   output: {schema: EcoSituationsOutputSchema},
   prompt: `You are a game designer creating scenarios for an educational game about sustainability and environmental civic sense.
 
-Generate a list of {{{count}}} scenarios based on the theme of {{{theme}}}.
+Generate a list of {{{count}}} scenarios in {{{language}}} based on the theme of {{{theme}}}.
 
 Each scenario should present a common, everyday situation where a person can make a choice that impacts the environment.
 

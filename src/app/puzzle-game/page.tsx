@@ -24,6 +24,13 @@ import {
 } from '@/components/ui/alert-dialog';
 import { generateWordPuzzles } from '@/ai/flows/generate-word-puzzle';
 import { Progress } from '@/components/ui/progress';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 type Puzzle = {
   word: string;
@@ -45,6 +52,13 @@ const shuffleWord = (word: string) => {
 
 const HINT_TIMER_DURATION = 15; // seconds
 
+const languages = [
+  { value: 'English', label: 'English' },
+  { value: 'Hindi', label: 'हिंदी' },
+  { value: 'Bengali', label: 'বাংলা' },
+  { value: 'Odia', label: 'ଓଡ଼ିଆ' },
+];
+
 export default function WordPuzzlePage() {
   const [puzzles, setPuzzles] = useState<Puzzle[]>([]);
   const [currentPuzzleIndex, setCurrentPuzzleIndex] = useState(0);
@@ -54,6 +68,7 @@ export default function WordPuzzlePage() {
   const [showCongrats, setShowCongrats] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [timeLeft, setTimeLeft] = useState(HINT_TIMER_DURATION);
+  const [language, setLanguage] = useState('English');
   const timerRef = useRef<NodeJS.Timeout | null>(null);
   const { toast } = useToast();
 
@@ -95,7 +110,7 @@ export default function WordPuzzlePage() {
     }
   }, [timeLeft, isSolved, currentPuzzleIndex, toast]);
 
-  const loadNewPuzzles = async () => {
+  const loadNewPuzzles = async (lang: string) => {
     setIsLoading(true);
     resetTimer();
     setGuess('');
@@ -105,7 +120,7 @@ export default function WordPuzzlePage() {
     setPuzzles([]);
     setCurrentPuzzleIndex(0);
     try {
-      const result = await generateWordPuzzles({ theme: 'sustainability, civic sense, waste management, carbon emission', count: 10 });
+      const result = await generateWordPuzzles({ theme: 'sustainability, civic sense, waste management, carbon emission', count: 10, language: lang });
       const newPuzzles = result.puzzles.map(p => ({
         ...p,
         scrambled: shuffleWord(p.word),
@@ -126,19 +141,23 @@ export default function WordPuzzlePage() {
   };
 
   useEffect(() => {
-    loadNewPuzzles();
+    loadNewPuzzles(language);
     return () => {
         if (timerRef.current) clearInterval(timerRef.current);
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [language]);
+
+  const handleLanguageChange = (lang: string) => {
+    setLanguage(lang);
+  };
 
   const currentPuzzle = puzzles[currentPuzzleIndex];
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (isSolved || !currentPuzzle) return;
-    if (guess.toUpperCase() === currentPuzzle.word) {
+    if (guess.toUpperCase() === currentPuzzle.word.toUpperCase()) {
       setFeedback('correct');
       setIsSolved(true);
       resetTimer();
@@ -162,7 +181,7 @@ export default function WordPuzzlePage() {
       setFeedback(null);
       startTimer();
     } else {
-      loadNewPuzzles(); // All puzzles solved, load a new batch
+      loadNewPuzzles(language); // All puzzles solved, load a new batch
     }
   };
   
@@ -180,7 +199,7 @@ export default function WordPuzzlePage() {
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <Button onClick={loadNewPuzzles} className="w-full">
+            <Button onClick={() => loadNewPuzzles(language)} className="w-full">
               <RotateCw className="mr-2" />
               Play Again
             </Button>
@@ -189,13 +208,27 @@ export default function WordPuzzlePage() {
       </AlertDialog>
 
       <div className="space-y-8">
-        <header>
-          <h2 className="text-3xl font-bold tracking-tight font-headline">
-            AI Eco Word Scramble
-          </h2>
-          <p className="text-muted-foreground mt-1">
-            {puzzles.length > 0 ? `Unscramble the sustainability word. (${currentPuzzleIndex + 1} of ${puzzles.length})` : 'Loading puzzles...'}
-          </p>
+        <header className="flex justify-between items-center">
+          <div>
+            <h2 className="text-3xl font-bold tracking-tight font-headline">
+              AI Eco Word Scramble
+            </h2>
+            <p className="text-muted-foreground mt-1">
+              {puzzles.length > 0 ? `Unscramble the sustainability word. (${currentPuzzleIndex + 1} of ${puzzles.length})` : 'Loading puzzles...'}
+            </p>
+          </div>
+          <div className="w-48">
+            <Select onValueChange={handleLanguageChange} defaultValue={language}>
+              <SelectTrigger>
+                <SelectValue placeholder="Select language" />
+              </SelectTrigger>
+              <SelectContent>
+                {languages.map((lang) => (
+                  <SelectItem key={lang.value} value={lang.value}>{lang.label}</SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
         </header>
 
         <Card className="max-w-xl mx-auto">

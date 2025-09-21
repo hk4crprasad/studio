@@ -27,6 +27,7 @@ const CarbonQuizInputSchema = z.object({
     .int()
     .positive()
     .describe('The number of questions to generate.'),
+    language: z.string().describe('The language for the quiz (e.g., "English", "Hindi", "Bengali", "Odia").'),
 });
 export type CarbonQuizInput = z.infer<typeof CarbonQuizInputSchema>;
 
@@ -47,7 +48,7 @@ const generateCarbonQuizPrompt = ai.definePrompt({
   output: {schema: CarbonQuizOutputSchema},
   prompt: `You are an expert in environmental science, creating a quiz about reducing carbon emissions.
 
-Generate a list of {{{count}}} quiz questions. Each question should be about a practical way to reduce one's carbon footprint.
+Generate a list of {{{count}}} quiz questions in {{{language}}}. Each question should be about a practical way to reduce one's carbon footprint.
 
 For each question, provide:
 - A clear, concise question.

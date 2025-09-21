@@ -13,6 +13,7 @@ import { z } from 'genkit';
 // Schema for generating the story
 const EcoStoryInputSchema = z.object({
   theme: z.string().describe('The environmental theme for the story (e.g., forestation, water conservation).'),
+  language: z.string().describe('The language for the story (e.g., "English", "Hindi", "Bengali", "Odia").'),
 });
 export type EcoStoryInput = z.infer<typeof EcoStoryInputSchema>;
 
@@ -27,6 +28,7 @@ export type EcoStoryOutput = z.infer<typeof EcoStoryOutputSchema>;
 // Schema for evaluating the completed story
 const EvaluateStoryInputSchema = z.object({
   story: z.string().describe("The user's completed story."),
+  language: z.string().describe('The language of the story (e.g., "English", "Hindi", "Bengali", "Odia").'),
 });
 export type EvaluateStoryInput = z.infer<typeof EvaluateStoryInputSchema>;
 
@@ -51,7 +53,7 @@ const generateEcoStoryPrompt = ai.definePrompt({
   name: 'generateEcoStoryPrompt',
   input: { schema: EcoStoryInputSchema },
   output: { schema: EcoStoryOutputSchema },
-  prompt: `You are a creative storyteller and environmental educator. Create a short, engaging, fill-in-the-blanks story for a game based on the theme of {{{theme}}}.
+  prompt: `You are a creative storyteller and environmental educator. Create a short, engaging, fill-in-the-blanks story for a game in {{{language}}} based on the theme of {{{theme}}}.
 
 The story should be a few paragraphs long and have between 4 and 6 blanks. Represent the blanks with numbered placeholders (e.g., "[1]", "[2]").
 
@@ -80,12 +82,12 @@ const evaluateEcoStoryPrompt = ai.definePrompt({
   name: 'evaluateEcoStoryPrompt',
   input: { schema: EvaluateStoryInputSchema },
   output: { schema: EvaluateStoryOutputSchema },
-  prompt: `You are an environmental expert. The user has completed a fill-in-the-blanks story.
+  prompt: `You are an environmental expert. The user has completed a fill-in-the-blanks story in {{{language}}}.
 
 User's completed story:
 "{{{story}}}"
 
-Based on the choices the user filled in, provide a concluding paragraph.
+Based on the choices the user filled in, provide a concluding paragraph in {{{language}}}.
 - Evaluate the choices made (even if they are incorrect distractors).
 - Explain the environmental impact of the correct actions.
 - If the user made wrong choices, gently correct them and explain the better alternative.

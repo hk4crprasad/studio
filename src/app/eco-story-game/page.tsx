@@ -22,10 +22,24 @@ import {
   AlertDialogHeader,
   AlertDialogTitle
 } from "@/components/ui/alert-dialog";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 const shuffleArray = <T,>(array: T[]): T[] => {
   return [...array].sort(() => Math.random() - 0.5);
 };
+
+const languages = [
+  { value: 'English', label: 'English' },
+  { value: 'Hindi', label: 'हिंदी' },
+  { value: 'Bengali', label: 'বাংলা' },
+  { value: 'Odia', label: 'ଓଡ଼ିଆ' },
+];
 
 export default function EcoStoryGamePage() {
   const [story, setStory] = useState<any>(null);
@@ -34,16 +48,17 @@ export default function EcoStoryGamePage() {
   const [isEvaluating, setIsEvaluating] = useState(false);
   const [answers, setAnswers] = useState<string[]>([]);
   const [wordBank, setWordBank] = useState<string[]>([]);
+  const [language, setLanguage] = useState('English');
   const { toast } = useToast();
 
-  const loadNewStory = async () => {
+  const loadNewStory = async (lang: string) => {
     setIsLoading(true);
     setStory(null);
     setEvaluation(null);
     setAnswers([]);
     setWordBank([]);
     try {
-      const result = await generateEcoStory({ theme: 'forestation and carbon emission reduction' });
+      const result = await generateEcoStory({ theme: 'forestation and carbon emission reduction', language: lang });
       setStory(result);
       setAnswers(Array(result.correctWords.length).fill(''));
       setWordBank(shuffleArray([...result.correctWords, ...result.incorrectWords]));
@@ -60,8 +75,12 @@ export default function EcoStoryGamePage() {
   };
 
   useEffect(() => {
-    loadNewStory();
-  }, []);
+    loadNewStory(language);
+  }, [language]);
+
+  const handleLanguageChange = (lang: string) => {
+    setLanguage(lang);
+  };
 
   const handleWordDrop = (index: number, word: string) => {
     if (answers[index] === word) return;
@@ -97,7 +116,7 @@ export default function EcoStoryGamePage() {
         const index = parseInt(match.replace(/[\[\]]/g, ''), 10) - 1;
         return answers[index] || '______';
       });
-      const result = await evaluateEcoStory({ story: completedStory });
+      const result = await evaluateEcoStory({ story: completedStory, language });
       setEvaluation(result.evaluation);
     } catch (error) {
       console.error("Failed to evaluate story:", error);
@@ -134,15 +153,15 @@ export default function EcoStoryGamePage() {
               <AlertDialogHeader className="items-center text-center">
                   <PartyPopper className="w-16 h-16 text-primary" />
                   <AlertDialogTitle className="font-headline text-3xl">Story Complete!</AlertDialogTitle>
-                  <div className="prose text-left text-base p-4">
+                  <div className="pt-4">
                     <h4 className="font-headline text-lg">AI Evaluation:</h4>
-                    <AlertDialogDescription>
+                    <AlertDialogDescription className="prose text-left text-base p-4">
                       {evaluation}
                     </AlertDialogDescription>
                   </div>
               </AlertDialogHeader>
               <AlertDialogFooter>
-                  <Button onClick={loadNewStory} className="w-full">
+                  <Button onClick={() => loadNewStory(language)} className="w-full">
                       <RotateCw className="mr-2" />
                       Play Another Story
                   </Button>
@@ -151,13 +170,27 @@ export default function EcoStoryGamePage() {
       </AlertDialog>
 
       <div className="space-y-8">
-        <header>
-          <h2 className="text-3xl font-bold tracking-tight font-headline">
-            AI Eco-Story Generator
-          </h2>
-          <p className="text-muted-foreground mt-1">
-           Complete the story by dragging the correct words into the blanks.
-          </p>
+        <header className="flex justify-between items-center">
+          <div>
+            <h2 className="text-3xl font-bold tracking-tight font-headline">
+              AI Eco-Story Generator
+            </h2>
+            <p className="text-muted-foreground mt-1">
+            Complete the story by dragging the correct words into the blanks.
+            </p>
+          </div>
+          <div className="w-48">
+            <Select onValueChange={handleLanguageChange} defaultValue={language}>
+              <SelectTrigger>
+                <SelectValue placeholder="Select language" />
+              </SelectTrigger>
+              <SelectContent>
+                {languages.map((lang) => (
+                  <SelectItem key={lang.value} value={lang.value}>{lang.label}</SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
         </header>
 
         <Card className="max-w-3xl mx-auto">

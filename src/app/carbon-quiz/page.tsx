@@ -21,6 +21,13 @@ import {
   AlertDialogHeader,
   AlertDialogTitle
 } from "@/components/ui/alert-dialog";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { cn } from '@/lib/utils';
 
 type Question = CarbonQuizQuestion;
@@ -40,6 +47,13 @@ const shuffleArray = <T,>(array: T[]): T[] => {
     return newArray;
 }
 
+const languages = [
+  { value: 'English', label: 'English' },
+  { value: 'Hindi', label: 'हिंदी' },
+  { value: 'Bengali', label: 'বাংলা' },
+  { value: 'Odia', label: 'ଓଡ଼ିଆ' },
+];
+
 export default function CarbonQuizPage() {
   const [questions, setQuestions] = useState<Question[]>([]);
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
@@ -47,9 +61,10 @@ export default function CarbonQuizPage() {
   const [isLoading, setIsLoading] = useState(true);
   const [score, setScore] = useState(0);
   const [isGameComplete, setIsGameComplete] = useState(false);
+  const [language, setLanguage] = useState('English');
   const { toast } = useToast();
 
-  const loadNewQuestions = async () => {
+  const loadNewQuestions = async (lang: string) => {
     setIsLoading(true);
     setSelectedOption(null);
     setQuestions([]);
@@ -57,7 +72,7 @@ export default function CarbonQuizPage() {
     setScore(0);
     setIsGameComplete(false);
     try {
-      const result = await generateCarbonQuiz({ count: 10 });
+      const result = await generateCarbonQuiz({ count: 10, language: lang });
       const shuffledQuestions = result.questions.map(question => ({
         ...question,
         options: shuffleArray(question.options)
@@ -76,8 +91,12 @@ export default function CarbonQuizPage() {
   };
 
   useEffect(() => {
-    loadNewQuestions();
-  }, []);
+    loadNewQuestions(language);
+  }, [language]);
+
+  const handleLanguageChange = (lang: string) => {
+    setLanguage(lang);
+  };
 
   const handleOptionSelect = (index: number) => {
     setSelectedOption(index);
@@ -104,7 +123,7 @@ export default function CarbonQuizPage() {
   };
 
   const handlePlayAgain = () => {
-    loadNewQuestions();
+    loadNewQuestions(language);
   }
 
   const currentQuestion = questions[currentQuestionIndex];
@@ -136,13 +155,27 @@ export default function CarbonQuizPage() {
       </AlertDialog>
 
       <div className="space-y-8">
-        <header>
-          <h2 className="text-3xl font-bold tracking-tight font-headline">
-            AI Carbon IQ Challenge
-          </h2>
-          <p className="text-muted-foreground mt-1">
-           {questions.length > 0 ? `Test your knowledge. (${currentQuestionIndex + 1} of ${questions.length})` : 'Loading questions...'}
-          </p>
+        <header className="flex justify-between items-center">
+          <div>
+            <h2 className="text-3xl font-bold tracking-tight font-headline">
+              AI Carbon IQ Challenge
+            </h2>
+            <p className="text-muted-foreground mt-1">
+            {questions.length > 0 ? `Test your knowledge. (${currentQuestionIndex + 1} of ${questions.length})` : 'Loading questions...'}
+            </p>
+          </div>
+          <div className="w-48">
+            <Select onValueChange={handleLanguageChange} defaultValue={language}>
+              <SelectTrigger>
+                <SelectValue placeholder="Select language" />
+              </SelectTrigger>
+              <SelectContent>
+                {languages.map((lang) => (
+                  <SelectItem key={lang.value} value={lang.value}>{lang.label}</SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
         </header>
 
         <Card className="max-w-2xl mx-auto">

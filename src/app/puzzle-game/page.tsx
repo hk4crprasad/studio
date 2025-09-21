@@ -12,7 +12,7 @@ import {
 } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { useToast } from '@/hooks/use-toast';
-import { CheckCircle, XCircle, Award, RotateCw, Loader2, WandSparkles } from 'lucide-react';
+import { CheckCircle, Info, Award, RotateCw, Loader2, WandSparkles } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import {
   AlertDialog,
@@ -22,7 +22,14 @@ import {
   AlertDialogDescription,
   AlertDialogFooter,
 } from '@/components/ui/alert-dialog';
-import { generateWordPuzzle } from '@/ai/flows/generate-word-puzzle';
+import { generateWordPuzzles } from '@/ai/flows/generate-word-puzzle';
+
+type Puzzle = {
+  word: string;
+  hint: string;
+  scrambled: string;
+  explanation: string;
+};
 
 const shuffleWord = (word: string) => {
   if (!word) return '';
@@ -34,9 +41,8 @@ const shuffleWord = (word: string) => {
 };
 
 export default function WordPuzzlePage() {
-  const [currentWord, setCurrentWord] = useState('');
-  const [hint, setHint] = useState('');
-  const [scrambledWord, setScrambledWord] = useState('');
+  const [puzzles, setPuzzles] = useState<Puzzle[]>([]);
+  const [currentPuzzleIndex, setCurrentPuzzleIndex] = useState(0);
   const [guess, setGuess] = useState('');
   const [feedback, setFeedback] = useState<'correct' | 'incorrect' | null>(null);
   const [isSolved, setIsSolved] = useState(false);
@@ -44,45 +50,48 @@ export default function WordPuzzlePage() {
   const [isLoading, setIsLoading] = useState(true);
   const { toast } = useToast();
 
-  const loadNewWord = async () => {
+  const loadNewPuzzles = async () => {
     setIsLoading(true);
     setGuess('');
     setFeedback(null);
     setIsSolved(false);
     setShowCongrats(false);
+    setPuzzles([]);
+    setCurrentPuzzleIndex(0);
     try {
-      const puzzle = await generateWordPuzzle({ theme: 'sustainability' });
-      setCurrentWord(puzzle.word);
-      setHint(puzzle.hint);
-      setScrambledWord(shuffleWord(puzzle.word));
+      const result = await generateWordPuzzles({ theme: 'sustainability', count: 10 });
+      const newPuzzles = result.puzzles.map(p => ({
+        ...p,
+        scrambled: shuffleWord(p.word),
+      }));
+      setPuzzles(newPuzzles);
     } catch (error) {
         console.error("Failed to generate word puzzle:", error);
         toast({
             variant: "destructive",
-            title: "Could not load puzzle",
-            description: "There was an issue generating a new word puzzle. Please try again."
+            title: "Could not load puzzles",
+            description: "There was an issue generating new word puzzles. Please try again."
         });
-        // Fallback to a simple word if AI fails
-        const fallbackWord = 'PLANET';
-        setCurrentWord(fallbackWord);
-        setHint('Our home in the solar system.');
-        setScrambledWord(shuffleWord(fallbackWord));
     } finally {
         setIsLoading(false);
     }
   };
 
   useEffect(() => {
-    loadNewWord();
+    loadNewPuzzles();
   }, []);
+
+  const currentPuzzle = puzzles[currentPuzzleIndex];
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (isSolved) return;
-    if (guess.toUpperCase() === currentWord) {
+    if (isSolved || !currentPuzzle) return;
+    if (guess.toUpperCase() === currentPuzzle.word) {
       setFeedback('correct');
       setIsSolved(true);
-      setShowCongrats(true);
+      if (currentPuzzleIndex === puzzles.length - 1) {
+        setShowCongrats(true);
+      }
       toast({
         title: 'Correct!',
         description: 'You earned 50 points!',
@@ -93,7 +102,14 @@ export default function WordPuzzlePage() {
   };
 
   const handleNextWord = () => {
-    loadNewWord();
+    if (currentPuzzleIndex < puzzles.length - 1) {
+      setCurrentPuzzleIndex(prev => prev + 1);
+      setIsSolved(false);
+      setGuess('');
+      setFeedback(null);
+    } else {
+      loadNewPuzzles(); // All puzzles solved, load a new batch
+    }
   };
 
   return (
@@ -104,13 +120,13 @@ export default function WordPuzzlePage() {
             <Award className="w-16 h-16 text-primary" />
             <AlertDialogTitle className="font-headline text-3xl">Congratulations!</AlertDialogTitle>
             <AlertDialogDescription className="text-lg">
-              You solved the puzzle and earned <span className="font-bold text-primary">50 points!</span>
+              You've solved all the puzzles and earned a total of <span className="font-bold text-primary">{puzzles.length * 50} points!</span>
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <Button onClick={handleNextWord} className="w-full">
+            <Button onClick={loadNewPuzzles} className="w-full">
               <RotateCw className="mr-2" />
-              Play Next Word
+              Play Again
             </Button>
           </AlertDialogFooter>
         </AlertDialogContent>
@@ -122,7 +138,7 @@ export default function WordPuzzlePage() {
             AI Eco Word Scramble
           </h2>
           <p className="text-muted-foreground mt-1">
-            Unscramble the letters to find the sustainability-related word generated by AI.
+            {puzzles.length > 0 ? `Unscramble the sustainability word. (${currentPuzzleIndex + 1} of ${puzzles.length})` : 'Loading puzzles...'}
           </p>
         </header>
 
@@ -137,57 +153,63 @@ export default function WordPuzzlePage() {
             {isLoading ? (
                  <div className="flex flex-col items-center justify-center p-4 text-center h-40">
                     <Loader2 className="w-8 h-8 animate-spin text-primary"/>
-                    <p className="mt-4 text-muted-foreground">Our AI is generating a new puzzle...</p>
+                    <p className="mt-4 text-muted-foreground">Our AI is generating new puzzles...</p>
                  </div>
-            ) : (
+            ) : currentPuzzle ? (
                 <>
                     <div className="flex items-center justify-center p-4 bg-muted rounded-lg w-full min-h-[80px]">
                         <p className="text-4xl font-bold tracking-widest text-primary font-mono">
-                            {scrambledWord}
+                            {isSolved ? currentPuzzle.word : currentPuzzle.scrambled}
                         </p>
                     </div>
                     <CardDescription className="text-center italic">
-                        Hint: {hint}
+                        Hint: {currentPuzzle.hint}
                     </CardDescription>
                 </>
+            ) : (
+                <div className="flex flex-col items-center justify-center p-4 text-center h-40">
+                    <p className="text-muted-foreground">Could not load puzzle. Try refreshing.</p>
+                </div>
             )}
             
-            {!isSolved && !isLoading && (
+            {!isSolved && !isLoading && currentPuzzle && (
                  <form onSubmit={handleSubmit} className="w-full space-y-4">
-                    <Input 
-                        value={guess}
-                        onChange={(e) => {
-                            setGuess(e.target.value);
-                            setFeedback(null);
-                        }}
-                        placeholder="Your answer"
-                        className="text-center text-lg h-12"
-                        aria-label="Your guess"
-                        disabled={isSolved}
-                    />
+                    <div className="relative">
+                      <Input 
+                          value={guess}
+                          onChange={(e) => {
+                              setGuess(e.target.value);
+                              setFeedback(null);
+                          }}
+                          placeholder="Your answer"
+                          className={cn("text-center text-lg h-12", 
+                            feedback === 'incorrect' ? 'border-destructive focus-visible:ring-destructive' : ''
+                          )}
+                          aria-label="Your guess"
+                          disabled={isSolved}
+                      />
+                      {feedback === 'correct' && <CheckCircle className="absolute right-3 top-1/2 -translate-y-1/2 w-5 h-5 text-green-500" />}
+                    </div>
                     <Button type="submit" className="w-full" disabled={!guess || isSolved}>
                         Check Answer
                     </Button>
                 </form>
             )}
 
-            {feedback && !isSolved && (
-                 <div className={cn(
-                    "w-full p-3 rounded-md border flex items-center gap-3",
-                    feedback === 'correct' ? 'border-green-500 bg-green-500/10 text-green-700' : 'border-red-500 bg-red-500/10 text-red-700'
-                 )}>
-                    {feedback === 'correct' ? <CheckCircle className="h-5 w-5" /> : <XCircle className="h-5 w-5" />}
-                    <p className="font-medium">
-                        {feedback === 'correct' ? 'That\'s right!' : 'Not quite, try again!'}
-                    </p>
-                 </div>
+            {isSolved && currentPuzzle && (
+                <div className="w-full p-4 rounded-md border-green-500 bg-green-500/10 text-green-800 flex items-start gap-3">
+                   <Info className="h-5 w-5 mt-0.5 flex-shrink-0" />
+                   <p className="font-medium">
+                       <span className="font-bold">Did you know?</span> {currentPuzzle.explanation}
+                   </p>
+                </div>
             )}
           </CardContent>
           {isSolved && (
             <CardFooter>
                  <Button onClick={handleNextWord} className="w-full" disabled={isLoading}>
-                    {isLoading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <RotateCw className="mr-2 h-4 w-4" />}
-                    <span>Next Word</span>
+                    <RotateCw className="mr-2 h-4 w-4" />
+                    <span>{currentPuzzleIndex < puzzles.length - 1 ? 'Next Word' : 'Play Again'}</span>
                 </Button>
             </CardFooter>
           )}

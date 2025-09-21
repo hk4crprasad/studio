@@ -31,6 +31,14 @@ import {
   Timer,
   PartyPopper,
   RotateCw,
+  Droplets,
+  Flower,
+  Leaf,
+  Battery,
+  Lamp,
+  Thermometer,
+  SprayCan,
+  Laptop
 } from 'lucide-react';
 import { Progress } from '@/components/ui/progress';
 import { cn } from '@/lib/utils';
@@ -56,12 +64,22 @@ const allWasteItems: WasteItem[] = [
   { id: 8, name: 'Egg Shells', Icon: Bone, type: 'wet' },
   { id: 9, name: 'Cardboard Box', Icon: Newspaper, type: 'dry' },
   { id: 10, name: 'Used Bandage', Icon: Biohazard, type: 'medical' },
+  { id: 11, 'name': 'Vegetable Peels', 'Icon': Leaf, 'type': 'wet' },
+  { id: 12, 'name': 'Fallen Leaves', 'Icon': Flower, 'type': 'wet' },
+  { id: 13, 'name': 'Water Bottle', 'Icon': Droplets, 'type': 'dry' },
+  { id: 14, 'name': 'Aerosol Can', 'Icon': SprayCan, 'type': 'dry' },
+  { id: 15, 'name': 'Old Thermometer', 'Icon': Thermometer, 'type': 'medical' },
+  { id: 16, 'name': 'Used Batteries', 'Icon': Battery, 'type': 'medical' },
+  { id: 17, 'name': 'Old Laptop', 'Icon': Laptop, 'type': 'dry' },
+  { id: 18, 'name': 'Tea Bags', 'Icon': Leaf, 'type': 'wet' },
+  { id: 19, 'name': 'Light Bulb', 'Icon': Lamp, 'type': 'dry' },
+  { id: 20, 'name': 'Painkiller Strips', 'Icon': Pill, 'type': 'medical' }
 ];
 
-const bins: { type: BinType; name: string; Icon: React.ElementType; color: string }[] = [
-  { type: 'wet', name: 'Wet Waste', Icon: Trash2, color: 'bg-green-500/20 border-green-500' },
-  { type: 'dry', name: 'Dry Waste', Icon: Recycle, color: 'bg-blue-500/20 border-blue-500' },
-  { type: 'medical', name: 'Medical Waste', Icon: Biohazard, color: 'bg-red-500/20 border-red-500' },
+const bins: { type: BinType; name: string; Icon: React.ElementType; color: string; textColor: string }[] = [
+  { type: 'wet', name: 'Wet Waste', Icon: Trash2, color: 'border-green-500 bg-green-500/10', textColor: 'text-green-600' },
+  { type: 'dry', name: 'Dry Waste', Icon: Recycle, color: 'border-blue-500 bg-blue-500/10', textColor: 'text-blue-600' },
+  { type: 'medical', name: 'Medical Waste', Icon: Biohazard, color: 'border-red-500 bg-red-500/10', textColor: 'text-red-600' },
 ];
 
 const shuffleArray = <T,>(array: T[]) => [...array].sort(() => Math.random() - 0.5);
@@ -88,12 +106,14 @@ export default function GarbageSortingGamePage() {
   };
 
   useEffect(() => {
-    if (gameState === 'playing' && timeLeft > 0) {
-      timerRef.current = setInterval(() => {
-        setTimeLeft((prev) => prev - 1);
-      }, 1000);
-    } else if (timeLeft === 0 && gameState === 'playing') {
-      setGameState('over');
+    if (gameState === 'playing') {
+      if (timeLeft > 0) {
+        timerRef.current = setInterval(() => {
+          setTimeLeft((prev) => prev - 1);
+        }, 1000);
+      } else {
+        setGameState('over');
+      }
     }
 
     return () => {
@@ -130,12 +150,21 @@ export default function GarbageSortingGamePage() {
     setIsDragging(true);
     if (currentItem) {
       e.dataTransfer.setData('text/plain', currentItem.id.toString());
+      e.dataTransfer.effectAllowed = 'move';
     }
   };
 
+  const resetGame = () => {
+    setGameState('ready');
+    setTimeLeft(GAME_DURATION);
+    setScore(0);
+    setWastePile([]);
+    setCurrentItem(null);
+  }
+
   return (
     <AppLayout>
-      <AlertDialog open={gameState === 'over'}>
+      <AlertDialog open={gameState === 'over'} onOpenChange={(open) => !open && resetGame()}>
         <AlertDialogContent>
           <AlertDialogHeader className="items-center text-center">
             <PartyPopper className="w-16 h-16 text-primary" />
@@ -162,7 +191,7 @@ export default function GarbageSortingGamePage() {
           <p className="text-muted-foreground mt-1">Drag the waste item to the correct bin before time runs out!</p>
         </header>
 
-        <Card className="max-w-4xl mx-auto">
+        <Card className="max-w-4xl mx-auto overflow-hidden">
           <CardHeader>
             <div className="flex justify-between items-center">
               <div className="text-2xl font-bold">Score: <span className="text-primary">{score}</span></div>
@@ -173,38 +202,43 @@ export default function GarbageSortingGamePage() {
             </div>
             <Progress value={(timeLeft / GAME_DURATION) * 100} className="mt-2 h-2" />
           </CardHeader>
-          <CardContent className="min-h-[400px] flex flex-col items-center justify-center p-6 relative">
+          <CardContent className="min-h-[450px] flex flex-col items-center justify-between p-6 relative">
             {gameState === 'ready' && (
-              <Button size="lg" onClick={startGame}>Start Game</Button>
+              <div className="flex flex-col items-center justify-center h-full">
+                <Button size="lg" onClick={startGame}>Start Game</Button>
+              </div>
             )}
             {gameState === 'playing' && (
               <>
-                <div className="absolute top-6 w-full">
+                <div className={cn("transition-opacity", isDragging ? "opacity-30" : "opacity-100")}>
                   {currentItem ? (
                      <div
                         draggable
                         onDragStart={handleDragStart}
                         onDragEnd={() => setIsDragging(false)}
-                        className="flex flex-col items-center gap-2 cursor-grab active:cursor-grabbing"
+                        className="flex flex-col items-center gap-4 cursor-grab active:cursor-grabbing p-4 rounded-lg bg-card"
                      >
-                       <currentItem.Icon className="w-24 h-24 text-foreground" />
-                       <p className="text-lg font-semibold">{currentItem.name}</p>
+                       <currentItem.Icon className="w-28 h-28 text-foreground" />
+                       <p className="text-xl font-semibold">{currentItem.name}</p>
                      </div>
                   ) : (
                     <p>Loading next item...</p>
                   )}
                 </div>
 
-                <div className="grid grid-cols-3 gap-6 w-full absolute bottom-6">
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-6 w-full">
                   {bins.map((bin) => (
                     <div
                       key={bin.type}
-                      onDragOver={(e) => e.preventDefault()}
+                      onDragOver={(e) => {
+                          e.preventDefault();
+                          e.dataTransfer.dropEffect = 'move';
+                      }}
                       onDrop={() => handleDrop(bin.type)}
                       className={cn(
-                        'flex flex-col items-center justify-center p-6 rounded-lg border-2 border-dashed transition-colors',
-                        bin.color,
-                         isDragging ? 'border-primary' : ''
+                        'flex flex-col items-center justify-center p-6 rounded-lg border-2 border-dashed transition-all h-40',
+                        bin.color, bin.textColor,
+                         isDragging ? 'border-primary scale-105 bg-primary/10' : ''
                       )}
                     >
                       <bin.Icon className="w-16 h-16 mb-2" />
@@ -216,7 +250,7 @@ export default function GarbageSortingGamePage() {
             )}
           </CardContent>
           {gameState === 'playing' && (
-              <CardFooter className="text-center justify-center">
+              <CardFooter className="text-center justify-center bg-muted/30 py-3">
                   <p className="text-muted-foreground text-sm">Drag the item from the top and drop it into one of the bins below.</p>
               </CardFooter>
           )}

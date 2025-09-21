@@ -24,6 +24,42 @@
       "description": "An article on the rise of renewable energy.",
       "imageUrl": "https://picsum.photos/seed/renewable/600/400",
       "imageHint": "wind turbine"
+    },
+    {
+      "id": "product-bamboo-toothbrush",
+      "description": "A set of bamboo toothbrushes.",
+      "imageUrl": "https://picsum.photos/seed/toothbrush/400/400",
+      "imageHint": "bamboo toothbrush"
+    },
+    {
+      "id": "product-reusable-bag",
+      "description": "A durable, reusable shopping bag.",
+      "imageUrl": "https://picsum.photos/seed/bag/400/400",
+      "imageHint": "reusable bag"
+    },
+    {
+      "id": "product-solar-charger",
+      "description": "A portable solar charger for electronic devices.",
+      "imageUrl": "https://picsum.photos/seed/solar-charger/400/400",
+      "imageHint": "solar charger"
+    },
+    {
+      "id": "product-compost-bin",
+      "description": "A kitchen compost bin.",
+      "imageUrl": "https://picsum.photos/seed/compost/400/400",
+      "imageHint": "compost bin"
+    },
+    {
+      "id": "product-led-bulbs",
+      "description": "A pack of energy-efficient LED light bulbs.",
+      "imageUrl": "https://picsum.photos/seed/led/400/400",
+      "imageHint": "LED bulbs"
+    },
+    {
+      "id": "product-shower-head",
+      "description": "A water-saving shower head.",
+      "imageUrl": "https://picsum.photos/seed/shower/400/400",
+      "imageHint": "shower head"
     }
   ]
 }

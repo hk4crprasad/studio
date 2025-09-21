@@ -133,3 +133,48 @@ export const articles = [
     date: '2024-04-28',
   },
 ];
+
+export const greenProducts = [
+  {
+    id: 'prod-1',
+    name: 'Bamboo Toothbrush Set',
+    description: 'A set of 4 biodegradable bamboo toothbrushes. A great alternative to plastic.',
+    price: 12.99,
+    image: PlaceHolderImages.find(img => img.id === 'product-bamboo-toothbrush'),
+  },
+  {
+    id: 'prod-2',
+    name: 'Reusable Shopping Bag',
+    description: 'A stylish and durable shopping bag made from recycled cotton. Folds up for easy storage.',
+    price: 15.50,
+    image: PlaceHolderImages.find(img => img.id === 'product-reusable-bag'),
+  },
+  {
+    id: 'prod-3',
+    name: 'Portable Solar Charger',
+    description: 'Charge your devices on the go with this compact and efficient solar-powered charger.',
+    price: 45.00,
+    image: PlaceHolderImages.find(img => img.id === 'product-solar-charger'),
+  },
+  {
+    id: 'prod-4',
+    name: 'Kitchen Compost Bin',
+    description: 'A sleek and odorless compost bin for your kitchen scraps. Perfect for starting to compost.',
+    price: 29.99,
+    image: PlaceHolderImages.find(img => img.id === 'product-compost-bin'),
+  },
+  {
+    id: 'prod-5',
+    name: 'LED Light Bulbs (4-Pack)',
+    description: 'Energy-efficient LED bulbs that use up to 80% less energy than traditional incandescent bulbs.',
+    price: 19.99,
+    image: PlaceHolderImages.find(img => img.id === 'product-led-bulbs'),
+  },
+  {
+    id: 'prod-6',
+    name: 'Water-Saving Shower Head',
+    description: 'Reduce water consumption in your daily showers without sacrificing pressure.',
+    price: 35.00,
+    image: PlaceHolderImages.find(img => img.id === 'product-shower-head'),
+  },
+];

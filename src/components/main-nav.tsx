@@ -13,6 +13,7 @@ import {
   Puzzle,
   ClipboardCheck,
   BrainCircuit,
+  ShoppingCart,
 } from 'lucide-react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
@@ -22,6 +23,7 @@ export function MainNav() {
   const menuItems = [
     { href: '/', label: 'Dashboard', icon: BarChart },
     { href: '/challenges', label: 'Challenges', icon: Gamepad2 },
+    { href: '/store', label: 'Green Store', icon: ShoppingCart },
     { href: '/schemes', label: 'Govt. Schemes', icon: Landmark },
     { href: '/blog', label: 'Blog', icon: Newspaper },
     { href: '/carbon-suggestions', label: 'AI Suggestions', icon: Bot },
@@ -36,7 +38,7 @@ export function MainNav() {
         <SidebarMenuItem key={item.href}>
           <SidebarMenuButton
             asChild
-            isActive={pathname === item.href}
+            isActive={pathname.startsWith(item.href) && (item.href === '/' ? pathname === '/' : true)}
             tooltip={{
               children: item.label,
               side: 'right',

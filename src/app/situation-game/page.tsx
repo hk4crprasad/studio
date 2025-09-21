@@ -16,6 +16,23 @@ import { generateEcoSituations, EcoSituation } from '@/ai/flows/generate-eco-sit
 
 type Scenario = EcoSituation;
 
+// Fisher-Yates shuffle algorithm
+const shuffleArray = <T,>(array: T[]): T[] => {
+    let currentIndex = array.length, randomIndex;
+    const newArray = [...array];
+
+    while (currentIndex !== 0) {
+        randomIndex = Math.floor(Math.random() * currentIndex);
+        currentIndex--;
+
+        [newArray[currentIndex], newArray[randomIndex]] = [
+            newArray[randomIndex], newArray[currentIndex]];
+    }
+
+    return newArray;
+}
+
+
 export default function SituationGamePage() {
   const [scenarios, setScenarios] = useState<Scenario[]>([]);
   const [currentScenarioIndex, setCurrentScenarioIndex] = useState(0);
@@ -30,7 +47,11 @@ export default function SituationGamePage() {
     setCurrentScenarioIndex(0);
     try {
       const result = await generateEcoSituations({ theme: 'everyday sustainability', count: 10 });
-      setScenarios(result.scenarios);
+      const shuffledScenarios = result.scenarios.map(scenario => ({
+        ...scenario,
+        options: shuffleArray(scenario.options)
+      }));
+      setScenarios(shuffledScenarios);
     } catch (error) {
       console.error("Failed to generate scenarios:", error);
       toast({

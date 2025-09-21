@@ -12,7 +12,6 @@ import {
   Newspaper,
   Puzzle,
   ClipboardCheck,
-  Package,
 } from 'lucide-react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
@@ -25,7 +24,7 @@ export function MainNav() {
     { href: '/challenges', label: 'Challenges', icon: Gamepad2 },
     { href: '/schemes', label: 'Govt. Schemes', icon: Landmark },
     { href: '/blog', label: 'Blog', icon: Newspaper },
-    { href: '/puzzle-game', label: 'Eco Puzzle', icon: Package },
+    { href: '/puzzle-game', label: 'Eco Puzzle', icon: Puzzle },
     { href: '/situation-game', label: 'Eco Situation', icon: ClipboardCheck },
   ];
 

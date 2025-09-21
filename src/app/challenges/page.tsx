@@ -55,18 +55,19 @@ export default function ChallengesPage() {
         </header>
         <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
           {gameChallenges.map((challenge, index) => (
-             <Card key={`game-${index}`} className="flex flex-col">
-              <CardHeader className="flex-row items-start gap-4 space-y-0">
-                <div className="flex-shrink-0">
+             <Card key={`game-${index}`} className="flex flex-col hover:border-primary/50 hover:shadow-lg transition-all">
+              <CardHeader className="flex-row items-center gap-4 space-y-0">
+                <div className="flex-shrink-0 p-3 bg-primary/10 rounded-full">
                     <challenge.icon className="h-8 w-8 text-primary" />
                 </div>
                 <div className="flex-grow">
                   <CardTitle className="font-headline text-lg">{challenge.title}</CardTitle>
-                  <CardDescription className="text-sm">{challenge.description}</CardDescription>
                 </div>
               </CardHeader>
-              <CardContent className="flex-grow"></CardContent>
-              <CardFooter className="flex justify-between items-center">
+              <CardContent className="flex-grow">
+                 <CardDescription className="text-sm">{challenge.description}</CardDescription>
+              </CardContent>
+              <CardFooter className="flex justify-between items-center bg-muted/50 p-4">
                 <div className="font-bold text-primary">Up to {challenge.points} Points</div>
                 <Button asChild>
                     <Link href={challenge.href}>Play Game</Link>
@@ -75,18 +76,19 @@ export default function ChallengesPage() {
             </Card>
           ))}
           {challenges.map((challenge, index) => (
-            <Card key={index} className="flex flex-col">
-              <CardHeader className="flex-row items-start gap-4 space-y-0">
-                <div className="flex-shrink-0">
+            <Card key={index} className="flex flex-col hover:border-primary/50 hover:shadow-lg transition-all">
+              <CardHeader className="flex-row items-center gap-4 space-y-0">
+                 <div className="flex-shrink-0 p-3 bg-primary/10 rounded-full">
                     <challenge.icon className="h-8 w-8 text-primary" />
                 </div>
                 <div className="flex-grow">
                   <CardTitle className="font-headline text-lg">{challenge.title}</CardTitle>
-                  <CardDescription className="text-sm">{challenge.description}</CardDescription>
                 </div>
               </CardHeader>
-              <CardContent className="flex-grow"></CardContent>
-              <CardFooter className="flex justify-between items-center">
+               <CardContent className="flex-grow">
+                  <CardDescription className="text-sm">{challenge.description}</CardDescription>
+              </CardContent>
+              <CardFooter className="flex justify-between items-center bg-muted/50 p-4">
                 <div className="font-bold text-primary">{challenge.points} Points</div>
                 <Button onClick={() => handleAcceptChallenge(challenge.title, challenge.points)}>
                   Accept Challenge

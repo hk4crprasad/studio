@@ -15,13 +15,13 @@ import { useToast } from '@/hooks/use-toast';
 import { generateEcoSituations, EcoSituation } from '@/ai/flows/generate-eco-situation';
 import {
   AlertDialog,
-  AlertDialogAction,
   AlertDialogContent,
   AlertDialogDescription,
   AlertDialogFooter,
   AlertDialogHeader,
   AlertDialogTitle
 } from "@/components/ui/alert-dialog";
+import { cn } from '@/lib/utils';
 
 type Scenario = EcoSituation;
 
@@ -144,11 +144,11 @@ export default function SituationGamePage() {
             AI Eco Situation Simulator
           </h2>
           <p className="text-muted-foreground mt-1">
-           {scenarios.length > 0 ? `Make the most sustainable choice in these AI-generated situations. (${currentScenarioIndex + 1} of ${scenarios.length})` : 'Loading scenarios...'}
+           {scenarios.length > 0 ? `Make the most sustainable choice. (${currentScenarioIndex + 1} of ${scenarios.length})` : 'Loading scenarios...'}
           </p>
         </header>
 
-        <Card className="max-w-xl mx-auto">
+        <Card className="max-w-2xl mx-auto">
           <CardHeader>
             {isLoading && scenarios.length === 0 ? (
                 <div className="space-y-2">
@@ -161,14 +161,14 @@ export default function SituationGamePage() {
             ) : (
                 currentScenario && (
                 <>
-                    <CardTitle className="font-headline">{currentScenario.title}</CardTitle>
-                    <CardDescription className="pt-2 text-base">
+                    <CardTitle className="font-headline text-center">{currentScenario.title}</CardTitle>
+                    <CardDescription className="pt-2 text-base text-center">
                     {currentScenario.description}
                     </CardDescription>
                 </>
             ))}
           </CardHeader>
-          <CardContent className="space-y-4 min-h-[200px]">
+          <CardContent className="space-y-4 min-h-[250px] flex flex-col justify-center">
             {isLoading && scenarios.length === 0 ? (
                  <div className="flex flex-col items-center justify-center p-4 text-center h-full">
                     <Loader2 className="w-8 h-8 animate-spin text-primary"/>
@@ -179,7 +179,7 @@ export default function SituationGamePage() {
                   <Button
                     key={index}
                     variant="outline"
-                    className="h-auto py-3 whitespace-normal justify-start text-left"
+                    className="h-auto py-4 whitespace-normal justify-start text-left text-base"
                     onClick={() => handleOptionSelect(index)}
                   >
                     {option.text}
@@ -188,11 +188,14 @@ export default function SituationGamePage() {
               </div>
             ) : (
                 choice && (
-                    <div className={`p-4 rounded-md border ${choice.isCorrect ? 'border-green-500 bg-green-500/10' : 'border-red-500 bg-red-500/10'}`}>
-                        <div className="flex items-start gap-3">
-                            {choice.isCorrect ? <CheckCircle className="h-5 w-5 text-green-600 mt-1" /> : <XCircle className="h-5 w-5 text-red-600 mt-1" />}
+                    <div className={cn(
+                      'p-4 rounded-md border text-center',
+                      choice.isCorrect ? 'border-green-500 bg-green-500/10' : 'border-red-500 bg-red-500/10'
+                    )}>
+                        <div className="flex flex-col items-center gap-3">
+                            {choice.isCorrect ? <CheckCircle className="h-8 w-8 text-green-600" /> : <XCircle className="h-8 w-8 text-red-600" />}
                             <div>
-                               <h4 className="font-bold">{choice.isCorrect ? "Correct!" : "Not Quite..."}</h4>
+                               <h4 className="font-bold text-lg">{choice.isCorrect ? "Correct!" : "Not Quite..."}</h4>
                                <p className="text-sm">{choice.feedback}</p>
                             </div>
                         </div>

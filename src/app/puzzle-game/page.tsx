@@ -21,9 +21,8 @@ import {
   AlertDialogTitle,
   AlertDialogDescription,
   AlertDialogFooter,
-  AlertDialogAction,
 } from '@/components/ui/alert-dialog';
-import { generateWordPuzzle, WordPuzzleOutput } from '@/ai/flows/generate-word-puzzle';
+import { generateWordPuzzle } from '@/ai/flows/generate-word-puzzle';
 
 const shuffleWord = (word: string) => {
   if (!word) return '';
@@ -79,6 +78,7 @@ export default function WordPuzzlePage() {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+    if (isSolved) return;
     if (guess.toUpperCase() === currentWord) {
       setFeedback('correct');
       setIsSolved(true);
@@ -165,7 +165,7 @@ export default function WordPuzzlePage() {
                         aria-label="Your guess"
                         disabled={isSolved}
                     />
-                    <Button type="submit" className="w-full" disabled={!guess}>
+                    <Button type="submit" className="w-full" disabled={!guess || isSolved}>
                         Check Answer
                     </Button>
                 </form>
@@ -184,9 +184,9 @@ export default function WordPuzzlePage() {
             )}
           </CardContent>
           {isSolved && (
-            <CardFooter className="flex flex-col gap-4 items-center text-center">
+            <CardFooter>
                  <Button onClick={handleNextWord} className="w-full" disabled={isLoading}>
-                    {isLoading ? <Loader2 className="animate-spin" /> : <RotateCw />}
+                    {isLoading ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <RotateCw className="mr-2 h-4 w-4" />}
                     <span>Next Word</span>
                 </Button>
             </CardFooter>

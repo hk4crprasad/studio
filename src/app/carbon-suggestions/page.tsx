@@ -78,7 +78,7 @@ export default function CarbonSuggestionsPage() {
           </p>
         </header>
 
-        <Card>
+        <Card className="max-w-2xl mx-auto">
           <Form {...form}>
             <form onSubmit={form.handleSubmit(onSubmit)}>
               <CardHeader>
@@ -138,8 +138,8 @@ export default function CarbonSuggestionsPage() {
         </Card>
 
         {isLoading && (
-            <Card>
-                <CardContent className="p-6 flex flex-col items-center justify-center space-y-4 text-center">
+            <Card className="max-w-2xl mx-auto">
+                <CardContent className="p-6 flex flex-col items-center justify-center space-y-4 text-center min-h-[200px]">
                     <Loader2 className="w-8 h-8 animate-spin text-primary"/>
                     <h3 className="font-headline text-lg">Our AI is thinking...</h3>
                     <p className="text-muted-foreground">Generating personalized suggestions just for you.</p>
@@ -148,7 +148,7 @@ export default function CarbonSuggestionsPage() {
         )}
 
         {suggestions && (
-          <Card>
+          <Card className="max-w-2xl mx-auto">
             <CardHeader>
               <CardTitle className="font-headline flex items-center gap-2">
                 <WandSparkles className="text-primary" />
@@ -156,14 +156,8 @@ export default function CarbonSuggestionsPage() {
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="prose prose-sm max-w-none dark:prose-invert prose-headings:font-headline">
-                {suggestions.suggestions.split('\n').map((line, index) => {
-                    const trimmedLine = line.trim();
-                    if (trimmedLine.startsWith('* ') || trimmedLine.startsWith('- ')) {
-                        return <p key={index} className="!mt-0">{trimmedLine.substring(2)}</p>;
-                    }
-                    return <p key={index} className="!my-2">{line}</p>;
-                })}
+              <div className="prose">
+                <p>{suggestions.suggestions}</p>
               </div>
             </CardContent>
           </Card>

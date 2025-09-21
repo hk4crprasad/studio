@@ -82,3 +82,33 @@
     @apply bg-background text-foreground;
   }
 }
+
+@layer components {
+    .prose {
+        @apply max-w-none text-foreground;
+
+        h1, h2, h3, h4, h5, h6 {
+            @apply font-headline text-foreground;
+        }
+
+        p, ul, ol, pre {
+            @apply my-4;
+        }
+
+        ul {
+            @apply list-disc pl-5;
+        }
+
+        li > ul {
+            @apply mt-2;
+        }
+
+        a {
+            @apply text-primary hover:underline;
+        }
+
+        blockquote {
+            @apply border-l-4 border-primary pl-4 italic text-muted-foreground;
+        }
+    }
+}

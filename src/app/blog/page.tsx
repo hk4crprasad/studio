@@ -19,20 +19,20 @@ export default function BlogPage() {
         </header>
         <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
           {articles.map((article) => (
-            <Card key={article.slug} className="flex flex-col overflow-hidden">
+            <Card key={article.slug} className="flex flex-col overflow-hidden group">
               {article.image && (
-                 <div className="aspect-video relative">
+                 <div className="aspect-video relative overflow-hidden">
                     <Image
                       src={article.image.imageUrl}
                       alt={article.image.description}
                       fill
-                      className="object-cover"
+                      className="object-cover transition-transform duration-300 ease-in-out group-hover:scale-105"
                       data-ai-hint={article.image.imageHint}
                     />
                  </div>
               )}
               <CardHeader>
-                <CardTitle className="font-headline text-lg">{article.title}</CardTitle>
+                <CardTitle className="font-headline text-lg group-hover:text-primary transition-colors">{article.title}</CardTitle>
                 <CardDescription className="text-xs">
                   By {article.author} on {article.date}
                 </CardDescription>

@@ -4,7 +4,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { BarChart as BarChartIcon, Bot, Gamepad2, TrendingUp } from 'lucide-react';
 import { ChartContainer, ChartTooltip, ChartTooltipContent } from '@/components/ui/chart';
-import { BarChart, Bar, XAxis, YAxis } from 'recharts';
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid } from 'recharts';
 import Link from 'next/link';
 import { Progress } from '@/components/ui/progress';
 
@@ -42,12 +42,9 @@ export default function DashboardPage() {
           <Card className="lg:col-span-1">
             <CardHeader>
               <CardTitle className="font-headline flex items-center gap-2">
-                <TrendingUp className="w-5 h-5" />
+                <TrendingUp className="w-5 h-5 text-primary" />
                 Your Eco Score
               </CardTitle>
-              <CardDescription>
-                Based on your recent activities and challenges.
-              </CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="flex items-baseline gap-2">
@@ -57,7 +54,7 @@ export default function DashboardPage() {
               <div>
                 <Progress value={78} className="h-2" />
                 <p className="text-xs text-muted-foreground mt-2">
-                  You're doing great! Keep it up to reach the next level.
+                  You're doing great! You've earned 780 out of 1000 points to the next level.
                 </p>
               </div>
             </CardContent>
@@ -66,7 +63,7 @@ export default function DashboardPage() {
           <Card className="lg:col-span-2">
             <CardHeader>
               <CardTitle className="font-headline flex items-center gap-2">
-                <BarChartIcon className="w-5 h-5" />
+                <BarChartIcon className="w-5 h-5 text-primary" />
                 Weekly Activity
               </CardTitle>
               <CardDescription>
@@ -75,7 +72,8 @@ export default function DashboardPage() {
             </CardHeader>
             <CardContent>
               <ChartContainer config={chartConfig} className="h-48 w-full">
-                <BarChart data={chartData} accessibilityLayer>
+                <BarChart data={chartData} accessibilityLayer margin={{ top: 20, right: 20, left: -20, bottom: 0 }}>
+                  <CartesianGrid vertical={false} />
                   <XAxis
                     dataKey="day"
                     tickLine={false}
@@ -100,11 +98,13 @@ export default function DashboardPage() {
             <CardHeader>
               <CardTitle className="font-headline">Start a New Challenge</CardTitle>
               <CardDescription>
-                Complete tasks to earn points and make a difference.
+                Play games, complete tasks to earn points and make a difference.
               </CardDescription>
             </CardHeader>
-            <CardContent className="flex-grow flex items-center justify-center text-center">
-              <Gamepad2 className="w-20 h-20 text-muted-foreground/30" />
+            <CardContent className="flex-grow flex items-center justify-center text-center p-6">
+               <div className="p-6 bg-primary/10 rounded-full">
+                 <Gamepad2 className="w-16 h-16 text-primary" />
+               </div>
             </CardContent>
             <CardContent>
               <Button asChild className="w-full">
@@ -119,8 +119,10 @@ export default function DashboardPage() {
                 Personalized suggestions to reduce your carbon footprint.
               </CardDescription>
             </CardHeader>
-            <CardContent className="flex-grow flex items-center justify-center text-center">
-              <Bot className="w-20 h-20 text-muted-foreground/30" />
+            <CardContent className="flex-grow flex items-center justify-center text-center p-6">
+                <div className="p-6 bg-primary/10 rounded-full">
+                  <Bot className="w-16 h-16 text-primary" />
+                </div>
             </CardContent>
             <CardContent>
               <Button asChild className="w-full">

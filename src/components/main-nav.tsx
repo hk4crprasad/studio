@@ -16,6 +16,8 @@ import {
   ShoppingCart,
   Recycle,
   BookMarked,
+  TreePine,
+  Activity,
 } from 'lucide-react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
@@ -24,6 +26,8 @@ export function MainNav() {
   const pathname = usePathname();
   const menuItems = [
     { href: '/', label: 'Dashboard', icon: BarChart },
+    { href: '/forest-dashboard', label: 'Forest Dashboard', icon: TreePine },
+    { href: '/carbon-tracker', label: 'Carbon Tracker', icon: Activity },
     { href: '/challenges', label: 'Challenges', icon: Gamepad2 },
     { href: '/store', label: 'Green Store', icon: ShoppingCart },
     { href: '/schemes', label: 'Govt. Schemes', icon: Landmark },

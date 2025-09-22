@@ -30,7 +30,7 @@ export async function generateCompletion(
 ): Promise<string> {
   const {
     temperature = 1,
-    maxTokens = 32000,
+    maxTokens = 4096,
     systemMessage = 'You are a helpful assistant.',
   } = options;
 
@@ -44,7 +44,7 @@ export async function generateCompletion(
       model: process.env.DEPLOYMENT_NAME!,
       messages,
       temperature,
-      max_completion_tokens: maxTokens,
+      max_tokens: maxTokens,
     });
 
     return response.choices[0]?.message?.content || '';
@@ -68,7 +68,7 @@ export async function generateStructuredCompletion<T>(
 ): Promise<T> {
   const {
     temperature = 1,
-    maxTokens = 72000,
+    maxTokens = 8192,
     systemMessage = 'You are a helpful assistant that responds with valid JSON.',
   } = options;
 
@@ -95,7 +95,7 @@ Important: Only return valid JSON, no additional text or explanation.`;
       model: process.env.DEPLOYMENT_NAME!,
       messages,
       temperature,
-      max_completion_tokens: maxTokens,
+      max_tokens: maxTokens,
       response_format: { type: 'json_object' },
     });
 
@@ -131,7 +131,7 @@ export async function generateConversationCompletion(
 ): Promise<string> {
   const {
     temperature = 1,
-    maxTokens = 32000,
+    maxTokens = 4096,
   } = options;
 
   try {
@@ -139,7 +139,7 @@ export async function generateConversationCompletion(
       model: process.env.DEPLOYMENT_NAME!,
       messages,
       temperature,
-      max_completion_tokens: maxTokens,
+      max_tokens: maxTokens,
     });
 
     return response.choices[0]?.message?.content || '';

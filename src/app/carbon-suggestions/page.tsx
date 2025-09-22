@@ -22,8 +22,9 @@ import {
   FormMessage,
 } from '@/components/ui/form';
 import { Textarea } from '@/components/ui/textarea';
-import { getCarbonEmissionSuggestions, CarbonEmissionSuggestionsOutput } from '@/ai/flows/carbon-emission-suggestions';
-import { Loader2, WandSparkles } from 'lucide-react';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { getCarbonEmissionSuggestions, CarbonEmissionSuggestionsOutput, CarbonSuggestion } from '@/ai/flows/carbon-emission-suggestions';
+import { Loader2, WandSparkles, Leaf, Lightbulb } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 
 const formSchema = z.object({
@@ -33,6 +34,7 @@ const formSchema = z.object({
   habits: z
     .string()
     .min(50, 'Please provide more detail about your habits (at least 50 characters).'),
+  language: z.string().min(1, 'Please select a language.'),
 });
 
 export default function CarbonSuggestionsPage() {
@@ -45,6 +47,7 @@ export default function CarbonSuggestionsPage() {
     defaultValues: {
       lifestyle: '',
       habits: '',
+      language: '',
     },
   });
 
@@ -122,6 +125,36 @@ export default function CarbonSuggestionsPage() {
                     </FormItem>
                   )}
                 />
+                <FormField
+                  control={form.control}
+                  name="language"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Response Language</FormLabel>
+                      <Select onValueChange={field.onChange} defaultValue={field.value}>
+                        <FormControl>
+                          <SelectTrigger>
+                            <SelectValue placeholder="Select language for suggestions" />
+                          </SelectTrigger>
+                        </FormControl>
+                        <SelectContent>
+                          <SelectItem value="English">English</SelectItem>
+                          <SelectItem value="Odia">Odia (ଓଡ଼ିଆ)</SelectItem>
+                          <SelectItem value="Hindi">Hindi (हिन्दी)</SelectItem>
+                          <SelectItem value="Bengali">Bengali (বাংলা)</SelectItem>
+                          <SelectItem value="Telugu">Telugu (తెలుగు)</SelectItem>
+                          <SelectItem value="Tamil">Tamil (தமிழ்)</SelectItem>
+                          <SelectItem value="Marathi">Marathi (मराठी)</SelectItem>
+                          <SelectItem value="Gujarati">Gujarati (ગુજરાતી)</SelectItem>
+                          <SelectItem value="Kannada">Kannada (ಕನ್ನಡ)</SelectItem>
+                          <SelectItem value="Malayalam">Malayalam (മലയാളം)</SelectItem>
+                          <SelectItem value="Punjabi">Punjabi (ਪੰਜਾਬੀ)</SelectItem>
+                        </SelectContent>
+                      </Select>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
               </CardContent>
               <CardFooter>
                 <Button type="submit" disabled={isLoading}>
@@ -148,19 +181,56 @@ export default function CarbonSuggestionsPage() {
         )}
 
         {suggestions && (
-          <Card className="max-w-2xl mx-auto">
-            <CardHeader>
-              <CardTitle className="font-headline flex items-center gap-2">
-                <WandSparkles className="text-primary" />
-                Here are your personalized suggestions
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="prose">
-                <p>{suggestions.suggestions}</p>
-              </div>
-            </CardContent>
-          </Card>
+          <div className="max-w-4xl mx-auto">
+            <Card className="mb-6">
+              <CardHeader>
+                <CardTitle className="font-headline flex items-center gap-2">
+                  <WandSparkles className="text-primary" />
+                  Your Personalized Carbon Reduction Plan
+                </CardTitle>
+                <CardDescription>
+                  Here are {suggestions.suggestions.length} actionable suggestions tailored to your lifestyle
+                </CardDescription>
+              </CardHeader>
+            </Card>
+
+            <div className="grid gap-4 md:grid-cols-2">
+              {suggestions.suggestions.map((suggestion, index) => (
+                <Card key={index} className="h-full">
+                  <CardHeader className="pb-3">
+                    <div className="flex items-center justify-between">
+                      <span className="inline-flex items-center rounded-full bg-green-100 px-2.5 py-0.5 text-xs font-medium text-green-800">
+                        {suggestion.category}
+                      </span>
+                      <span className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium ${
+                        suggestion.difficulty === 'Easy' ? 'bg-green-100 text-green-800' :
+                        suggestion.difficulty === 'Medium' ? 'bg-yellow-100 text-yellow-800' :
+                        'bg-red-100 text-red-800'
+                      }`}>
+                        {suggestion.difficulty}
+                      </span>
+                    </div>
+                    <CardTitle className="text-lg font-headline flex items-start gap-2">
+                      <Leaf className="w-5 h-5 text-green-600 mt-0.5 flex-shrink-0" />
+                      {suggestion.title}
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent className="pt-0">
+                    <p className="text-muted-foreground mb-3 text-sm leading-relaxed">
+                      {suggestion.description}
+                    </p>
+                    <div className="flex items-start gap-2 p-3 bg-green-50 rounded-lg">
+                      <Lightbulb className="w-4 h-4 text-green-600 mt-0.5 flex-shrink-0" />
+                      <div>
+                        <p className="text-xs font-medium text-green-800 mb-1">Environmental Impact</p>
+                        <p className="text-xs text-green-700">{suggestion.impact}</p>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+          </div>
         )}
       </div>
     </AppLayout>

@@ -23,9 +23,23 @@ import {
 } from '@/components/ui/form';
 import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { getCarbonEmissionSuggestions, CarbonEmissionSuggestionsOutput, CarbonSuggestion } from '@/ai/flows/carbon-emission-suggestions';
 import { Loader2, WandSparkles, Leaf, Lightbulb } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
+
+// Type definitions for the API response
+interface CarbonSuggestion {
+  category: string;
+  suggestion: string;
+  impact: 'high' | 'medium' | 'low';
+  difficulty: 'easy' | 'medium' | 'hard';
+  description: string;
+}
+
+interface CarbonEmissionSuggestionsOutput {
+  suggestions: CarbonSuggestion[];
+  summary: string;
+  totalEstimatedReduction: string;
+}
 
 const formSchema = z.object({
   lifestyle: z
@@ -55,7 +69,19 @@ export default function CarbonSuggestionsPage() {
     setIsLoading(true);
     setSuggestions(null);
     try {
-      const result = await getCarbonEmissionSuggestions(values);
+      const response = await fetch('/api/carbon-suggestions', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(values),
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to get carbon suggestions');
+      }
+
+      const result = await response.json();
       setSuggestions(result);
     } catch (error) {
       console.error("Error getting suggestions:", error);

@@ -7,7 +7,6 @@ import { Textarea } from '@/components/ui/textarea';
 import { Badge } from '@/components/ui/badge';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Calendar, Leaf, TrendingUp, TrendingDown, Activity, Target } from 'lucide-react';
-import { analyzeCarbonFootprint } from '@/ai/flows/analyze-carbon-footprint';
 import { 
   CarbonAnalysis, 
   sampleCarbonEntries, 
@@ -32,11 +31,23 @@ export default function CarbonTracker() {
 
     setIsAnalyzing(true);
     try {
-      const result = await analyzeCarbonFootprint({
-        activities,
-        language,
-        date: new Date().toISOString().split('T')[0]
+      const response = await fetch('/api/analyze-carbon', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          activities,
+          language,
+          date: new Date().toISOString().split('T')[0]
+        }),
       });
+
+      if (!response.ok) {
+        throw new Error('Failed to analyze carbon footprint');
+      }
+
+      const result = await response.json();
       setAnalysis(result);
 
       // Add new entries to the tracker

@@ -19,7 +19,7 @@ export function AppLayout({ children }: { children: ReactNode }) {
         <SidebarHeader>
           <Link href="/" className="flex items-center gap-2">
             <Icons.logo className="w-6 h-6 text-primary" />
-            <h1 className="text-xl font-headline font-semibold">EcoAction</h1>
+            <h1 className="text-xl font-headline font-semibold">GreenLife</h1>
           </Link>
         </SidebarHeader>
         <SidebarContent>

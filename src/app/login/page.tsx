@@ -20,7 +20,7 @@ export default function LoginPage() {
             <div className="flex justify-center mb-4">
                 <Icons.logo className="w-10 h-10 text-primary" />
             </div>
-          <CardTitle className="font-headline text-2xl">Welcome to EcoAction</CardTitle>
+          <CardTitle className="font-headline text-2xl">Welcome to GreenLife</CardTitle>
           <CardDescription>Enter your credentials to access your account.</CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">

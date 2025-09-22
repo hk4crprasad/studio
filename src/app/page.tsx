@@ -52,7 +52,7 @@ export default function DashboardPage() {
       <div className="space-y-8">
         <header>
           <h2 className="text-3xl font-bold tracking-tight font-headline">
-            Welcome to EcoAction
+            Welcome to GreenLife
           </h2>
           <p className="text-muted-foreground mt-1">
             Your journey to a more sustainable life starts here.

@@ -1,11 +1,11 @@
-# **App Name**: EcoAction
+# **App Name**: GreenLife
 
 ## Core Features:
 
 - Carbon Emission Reduction Suggestions: AI-powered tool that analyzes user input (lifestyle, habits) and suggests personalized ways to minimize their carbon footprint, incorporating the latest climate science and environmental best practices.
 - Gamified Awareness Platform: Interactive games and challenges to educate users on energy saving, civic sense, carpooling, waste segregation, and other sustainability topics.
 - Government Scheme Awareness: A regularly updated source of information on government schemes related to climate change, afforestation, and other environmental initiatives, presented in an easy-to-understand format.
-- Rewards System: Users receive points and badges for completing challenges, reducing their carbon footprint, and participating in EcoAction activities. Integration with other platforms to get discounts or special offers will not be included in the MVP.
+- Rewards System: Users receive points and badges for completing challenges, reducing their carbon footprint, and participating in GreenLife activities. Integration with other platforms to get discounts or special offers will not be included in the MVP.
 - Blog Upload and Article Display: Articles on climate change, deforestation, and urbanization uploaded by the admin are displayed on the platform for users to access.
 - Admin Login: Admin users can securely login.
 
